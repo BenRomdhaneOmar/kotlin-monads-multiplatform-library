@@ -8,7 +8,7 @@ import kotlin.uuid.Uuid
 class MaybeTest {
 
     @Test
-    fun `maybe present must return true if it was initiated as non empty`() {
+    fun `present must return true if maybe was initiated as non empty`() {
         val initialElement = Uuid.random().toString()
         val result =
             Maybe
@@ -20,7 +20,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe empty must return false if it was initiated as non empty`() {
+    fun `empty must return false if maybe was initiated as non empty`() {
         val initialElement = Uuid.random().toString()
         val result =
             Maybe
@@ -32,7 +32,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe present must return false if it was initiated as empty`() {
+    fun `present must return false if maybe was initiated as empty`() {
         val result =
             Maybe
                 .Empty
@@ -43,7 +43,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe empty must return true if it was initiated as empty`() {
+    fun `empty must return true if maybe was initiated as empty`() {
         val result =
             Maybe
                 .Empty
@@ -54,7 +54,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe orNull must return null if it was initiated as empty`() {
+    fun `orNull must return null if maybe was initiated as empty`() {
         val result =
             Maybe
                 .Empty
@@ -65,7 +65,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe orNull must return the initial element if it was initiated as non empty`() {
+    fun `orNull must return the initial element if maybe was initiated as non empty`() {
         val initialElement = Uuid.random().toString()
         val result =
             Maybe
@@ -77,7 +77,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe or with element parameter must return the provided element if it was initiated as empty`() {
+    fun `or with element parameter must return the provided element if maybe was initiated as empty`() {
         val element = Uuid.random().toString()
         val result =
             Maybe
@@ -89,7 +89,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe or with element parameter must return the initial element if it was initiated as non empty`() {
+    fun `or with element parameter must return the initial element if maybe was initiated as non empty`() {
         val initialElement = Uuid.random().toString()
         val secondElement = Uuid.random().toString()
         val result =
@@ -102,7 +102,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe or throw must throw empty maybe exception if it was initiated as empty`() {
+    fun `or throw must throw empty maybe exception if maybe was initiated as empty`() {
         assertFailsWith<Maybe.EmptyMaybeException> {
             Maybe
                 .Empty
@@ -112,7 +112,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe or throw must return the initial element if it was initiated as non empty`() {
+    fun `or throw must return the initial element if maybe was initiated as non empty`() {
         val initialElement = Uuid.random().toString()
         val result =
             Maybe
@@ -124,7 +124,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe map must be ignored if it was initiated as empty`() {
+    fun `map must be ignored if maybe was initiated as empty`() {
         val result =
             Maybe
                 .Empty
@@ -136,7 +136,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe map must transform the initial element if it was initiated as non empty`() {
+    fun `map must transform the initial element if maybe was initiated as non empty`() {
         val initialElement = Uuid.random().toString()
         val result =
             Maybe
@@ -149,7 +149,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `maybe map must transform the previous statue if it was initiated as non empty`() {
+    fun `map must transform the previous statue if maybe was initiated as non empty`() {
         val initialElement = Uuid.random().toString()
         val result =
             Maybe
@@ -160,5 +160,55 @@ class MaybeTest {
                 .orNull()!!
 
         assertEquals(initialElement.length.times(10), result)
+    }
+
+    @Test
+    fun `flat map must transform to empty if the mapping result is empty maybe and if maybe was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .flatMap { Maybe.Empty.of<Int>() }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `flat map must transform the previous statue if the mapping result is non empty maybe and if maybe was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .flatMap { Maybe.NotEmpty.of(it.length) }
+                .orNull()!!
+
+        assertEquals(initialElement.length, result)
+    }
+
+    @Test
+    fun `flat map must return empty if the mapping result is non empty maybe and if maybe was initiated as empty`() {
+        val result =
+            Maybe
+                .Empty
+                .of<Int>()
+                .flatMap { Maybe.NotEmpty.of(Uuid.random().toString()) }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `flat map must return empty if the mapping result is empty maybe and if maybe was initiated as empty`() {
+        val result =
+            Maybe
+                .Empty
+                .of<Int>()
+                .flatMap { Maybe.Empty.of<String>() }
+                .empty()
+
+        assertTrue { result }
     }
 }

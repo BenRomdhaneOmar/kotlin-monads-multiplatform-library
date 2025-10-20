@@ -10,6 +10,7 @@ sealed interface Maybe<ELEMENT> {
     @Throws(EmptyMaybeException::class)
     fun orThrow(): ELEMENT
     fun <NEW_ELEMENT> map(mapper: (ELEMENT) -> NEW_ELEMENT): Maybe<NEW_ELEMENT>
+    fun <NEW_ELEMENT> flatMap(mapper: (ELEMENT) -> Maybe<NEW_ELEMENT>): Maybe<NEW_ELEMENT>
 
     class Empty<ELEMENT> private constructor() : Maybe<ELEMENT> {
 
@@ -18,6 +19,7 @@ sealed interface Maybe<ELEMENT> {
         override fun or(element: ELEMENT) = element
         override fun orThrow() = throw EmptyMaybeException()
         override fun <NEW_ELEMENT> map(mapper: (ELEMENT) -> NEW_ELEMENT) = Empty<NEW_ELEMENT>()
+        override fun <NEW_ELEMENT> flatMap(mapper: (ELEMENT) -> Maybe<NEW_ELEMENT>) = Empty<NEW_ELEMENT>()
 
         companion object Builder {
 
@@ -26,7 +28,8 @@ sealed interface Maybe<ELEMENT> {
     }
 
     @ConsistentCopyVisibility
-    data class NotEmpty<ELEMENT> private constructor(
+    data class NotEmpty<ELEMENT>
+    private constructor(
         private val element: ELEMENT
     ) : Maybe<ELEMENT> {
 
@@ -34,19 +37,13 @@ sealed interface Maybe<ELEMENT> {
         override fun orNull() = this.element
         override fun or(element: ELEMENT) = this.element
         override fun orThrow() = this.element
-        override fun <NEW_ELEMENT> map(mapper: (ELEMENT) -> NEW_ELEMENT) =
-            NotEmpty(
-                mapper(
-                    this.element
-                )
-            )
+        override fun <NEW_ELEMENT> map(mapper: (ELEMENT) -> NEW_ELEMENT) = NotEmpty(mapper(this.element))
+
+        override fun <NEW_ELEMENT> flatMap(mapper: (ELEMENT) -> Maybe<NEW_ELEMENT>) = mapper(this.element)
 
         companion object Builder {
 
-            fun <ELEMENT> of(element: ELEMENT): Maybe<ELEMENT> =
-                NotEmpty(
-                    element
-                )
+            fun <ELEMENT> of(element: ELEMENT): Maybe<ELEMENT> = NotEmpty(element)
         }
     }
 
