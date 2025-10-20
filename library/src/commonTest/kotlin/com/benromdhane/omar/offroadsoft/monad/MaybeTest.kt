@@ -100,4 +100,26 @@ class MaybeTest {
 
         assertEquals(initialElement, result)
     }
+
+    @Test
+    fun `maybe or throw must throw empty maybe exception if it was initiated as empty`() {
+        assertFailsWith<Maybe.EmptyMaybeException> {
+            Maybe
+                .Empty
+                .of<String>()
+                .orThrow()
+        }
+    }
+
+    @Test
+    fun `maybe or throw must return the initial element if it was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .orThrow()
+
+        assertEquals(initialElement, result)
+    }
 }

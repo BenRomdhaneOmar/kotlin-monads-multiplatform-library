@@ -7,11 +7,15 @@ sealed interface Maybe<ELEMENT> {
     fun orNull(): ELEMENT?
     fun or(element: ELEMENT): ELEMENT
 
+    @Throws(EmptyMaybeException::class)
+    fun orThrow(): ELEMENT
+
     class Empty<ELEMENT> private constructor() : Maybe<ELEMENT> {
 
         override fun present() = false
         override fun orNull(): ELEMENT? = null
         override fun or(element: ELEMENT) = element
+        override fun orThrow() = throw EmptyMaybeException()
 
         companion object Builder {
 
@@ -27,6 +31,7 @@ sealed interface Maybe<ELEMENT> {
         override fun present() = true
         override fun orNull() = this.element
         override fun or(element: ELEMENT) = this.element
+        override fun orThrow() = this.element
 
         companion object Builder {
 
@@ -36,4 +41,6 @@ sealed interface Maybe<ELEMENT> {
                 )
         }
     }
+
+    class EmptyMaybeException : Throwable()
 }
