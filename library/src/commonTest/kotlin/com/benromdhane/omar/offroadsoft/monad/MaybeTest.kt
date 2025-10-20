@@ -1,8 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad
 
-import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -53,5 +51,28 @@ class MaybeTest {
                 .empty()
 
         assertTrue { result }
+    }
+
+    @Test
+    fun `maybe orNull must return null if it was initiated as empty`() {
+        val result =
+            Maybe
+                .Empty
+                .of<Any>()
+                .orNull()
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `maybe orNull must return the initial element if it was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .orNull()!!
+
+        assertEquals(initialElement, result)
     }
 }
