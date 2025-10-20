@@ -75,4 +75,29 @@ class MaybeTest {
 
         assertEquals(initialElement, result)
     }
+
+    @Test
+    fun `maybe or with element parameter must return the provided element if it was initiated as empty`() {
+        val element = Uuid.random().toString()
+        val result =
+            Maybe
+                .Empty
+                .of<String>()
+                .or(element)
+
+        assertEquals(element, result)
+    }
+
+    @Test
+    fun `maybe or with element parameter must return the initial element if it was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        val secondElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .or(secondElement)
+
+        assertEquals(initialElement, result)
+    }
 }

@@ -5,11 +5,13 @@ sealed interface Maybe<ELEMENT> {
     fun present(): Boolean
     fun empty() = present().not()
     fun orNull(): ELEMENT?
+    fun or(element: ELEMENT): ELEMENT
 
     class Empty<ELEMENT> private constructor() : Maybe<ELEMENT> {
 
         override fun present() = false
         override fun orNull(): ELEMENT? = null
+        override fun or(element: ELEMENT) = element
 
         companion object Builder {
 
@@ -24,6 +26,7 @@ sealed interface Maybe<ELEMENT> {
 
         override fun present() = true
         override fun orNull() = this.element
+        override fun or(element: ELEMENT) = this.element
 
         companion object Builder {
 
