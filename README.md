@@ -1,0 +1,55 @@
+# Kotlin Monads library
+
+## Run tests for all targets:
+
+```shell
+./gradlew clean allTests
+```
+
+## Run tests for jvm targets:
+
+```shell
+./gradlew clean jvmTest
+```
+
+## Run Kotlin/Native tests for linuxX64 target:
+
+```shell
+./gradlew clean linuxX64Test
+```
+
+## Run wasmJs tests inside browser using karma and webpack:
+
+```shell
+./gradlew clean wasmJsBrowserTest
+```
+
+## Run JS tests for all platforms:
+
+```shell
+./gradlew clean wasmJsTest
+```
+
+## Run tests for androidMain:
+
+```shell
+./gradlew clean testAndroidHostTest
+```
+
+## Run tests for all android variants:
+
+```shell
+./gradlew clean testAndroid
+```
+
+## Run tests for androidMain on connected devices:
+
+```shell
+./gradlew clean connectedAndroidDeviceTest
+```
+
+## Run tests for all flavors on connected devices:
+
+```shell
+./gradlew clean connectedAndroidTest
+```
