@@ -122,4 +122,43 @@ class MaybeTest {
 
         assertEquals(initialElement, result)
     }
+
+    @Test
+    fun `maybe map must be ignored if it was initiated as empty`() {
+        val result =
+            Maybe
+                .Empty
+                .of<String>()
+                .map { it.length }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `maybe map must transform the initial element if it was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .map { it.length }
+                .orNull()!!
+
+        assertEquals(initialElement.length, result)
+    }
+
+    @Test
+    fun `maybe map must transform the previous statue if it was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .map { it.length }
+                .map { it.times(10) }
+                .orNull()!!
+
+        assertEquals(initialElement.length.times(10), result)
+    }
 }

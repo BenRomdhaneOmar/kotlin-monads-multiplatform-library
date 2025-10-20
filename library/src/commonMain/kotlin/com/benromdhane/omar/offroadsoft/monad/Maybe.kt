@@ -9,6 +9,7 @@ sealed interface Maybe<ELEMENT> {
 
     @Throws(EmptyMaybeException::class)
     fun orThrow(): ELEMENT
+    fun <NEW_ELEMENT> map(mapper: (ELEMENT) -> NEW_ELEMENT): Maybe<NEW_ELEMENT>
 
     class Empty<ELEMENT> private constructor() : Maybe<ELEMENT> {
 
@@ -16,6 +17,7 @@ sealed interface Maybe<ELEMENT> {
         override fun orNull(): ELEMENT? = null
         override fun or(element: ELEMENT) = element
         override fun orThrow() = throw EmptyMaybeException()
+        override fun <NEW_ELEMENT> map(mapper: (ELEMENT) -> NEW_ELEMENT) = Empty<NEW_ELEMENT>()
 
         companion object Builder {
 
@@ -32,6 +34,12 @@ sealed interface Maybe<ELEMENT> {
         override fun orNull() = this.element
         override fun or(element: ELEMENT) = this.element
         override fun orThrow() = this.element
+        override fun <NEW_ELEMENT> map(mapper: (ELEMENT) -> NEW_ELEMENT) =
+            NotEmpty(
+                mapper(
+                    this.element
+                )
+            )
 
         companion object Builder {
 
