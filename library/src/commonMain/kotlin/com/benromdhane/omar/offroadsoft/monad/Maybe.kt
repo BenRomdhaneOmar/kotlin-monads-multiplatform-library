@@ -49,3 +49,5 @@ sealed interface Maybe<ELEMENT> {
 
     class EmptyMaybeException : Throwable()
 }
+
+fun <ELEMENT> Maybe<Maybe<ELEMENT>>.flatten() = this.flatMap { it }

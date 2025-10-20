@@ -211,4 +211,57 @@ class MaybeTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `flatten must return empty if the inner maybe is empty and if maybe was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .map { Maybe.Empty.of<Int>() }
+                .flatten()
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `flatten must return non empty single level maybe if the inner maybe is not empty and if maybe was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .map { Maybe.NotEmpty.of(it.length) }
+                .flatten()
+                .orNull()!!
+
+        assertEquals(initialElement.length, result)
+    }
+
+    @Test
+    fun `flatten must return empty maybe if the inner maybe is non empty and if maybe was initiated as empty`() {
+        val result =
+            Maybe
+                .Empty
+                .of<Int>()
+                .flatMap { Maybe.NotEmpty.of(Uuid.random().toString()) }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `flatten must return empty maybe if the inner maybe is empty and if maybe was initiated as empty`() {
+        val result =
+            Maybe
+                .Empty
+                .of<Int>()
+                .map { Maybe.Empty.of<String>() }
+                .flatten()
+                .empty()
+
+        assertTrue { result }
+    }
 }
