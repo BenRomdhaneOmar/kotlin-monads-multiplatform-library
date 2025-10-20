@@ -63,12 +63,18 @@ kotlin {
     }
 }
 
+publishing {
+    publications {
+
+    }
+}
+
 mavenPublishing {
     publishToMavenCentral()
 
-    signAllPublications()
+//    signAllPublications()
 
-    coordinates(group.toString(), "library", version.toString())
+    coordinates(group.toString(), "kotlin-monads-multiplatform-library", version.toString())
 
     pom {
         name = "Off Road Soft kotlin monads multiplatform library"

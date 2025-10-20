@@ -53,3 +53,9 @@
 ```shell
 ./gradlew clean connectedAndroidTest
 ```
+
+## Publish to local maven:
+
+```shell
+./gradlew clean publishToMavenLocal
+```
