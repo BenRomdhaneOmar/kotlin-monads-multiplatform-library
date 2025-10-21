@@ -22,10 +22,7 @@ sealed interface Either<LEFT, RIGHT> {
 
         companion object Builder {
 
-            fun <LEFT, RIGHT> of(right: RIGHT) =
-                Right<LEFT, RIGHT>(
-                    right
-                )
+            fun <LEFT, RIGHT> of(right: RIGHT): Either<LEFT, RIGHT> = Right(right)
         }
     }
 
@@ -42,10 +39,7 @@ sealed interface Either<LEFT, RIGHT> {
 
         companion object Builder {
 
-            fun <LEFT, RIGHT> of(left: LEFT) =
-                Left<LEFT, RIGHT>(
-                    left
-                )
+            fun <LEFT, RIGHT> of(left: LEFT): Either<LEFT, RIGHT> = Left(left)
         }
     }
 }
