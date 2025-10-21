@@ -83,4 +83,30 @@ class EitherTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `to maybe left must return maybe that contains the initial element if either was initiated as left`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<_, String>(initialElement)
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `to maybe left must return empty maybe if either was initiated as right`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<String, _>(initialElement)
+                .toMaybeLeft()
+                .empty()
+
+        assertTrue { result }
+    }
 }
