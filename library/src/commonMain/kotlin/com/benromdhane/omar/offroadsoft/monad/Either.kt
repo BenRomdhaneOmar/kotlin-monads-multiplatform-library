@@ -3,6 +3,7 @@ package com.benromdhane.omar.offroadsoft.monad
 sealed interface Either<LEFT, RIGHT> {
 
     fun right(): Boolean
+    fun left() = right().not()
 
     @ConsistentCopyVisibility
     data class Right<LEFT, RIGHT> private constructor(

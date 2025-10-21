@@ -32,4 +32,28 @@ class EitherTest {
 
         assertFalse { result }
     }
+
+    @Test
+    fun `left must return false if either was initiated as right`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<String, Any>(initialElement)
+                .left()
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `left must return true if either was initiated as left`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<Any, String>(initialElement)
+                .left()
+
+        assertTrue { result }
+    }
 }
