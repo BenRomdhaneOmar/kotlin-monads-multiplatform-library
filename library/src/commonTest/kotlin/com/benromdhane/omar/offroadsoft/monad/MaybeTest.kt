@@ -264,4 +264,42 @@ class MaybeTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `filter must return empty maybe if maybe was initiated as empty`() {
+        val result =
+            Maybe
+                .Empty
+                .of<Int>()
+                .filter { true }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `filter must return empty maybe if the filter does not apply on the actual value and if maybe was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .filter { it.isEmpty() }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `filter must return non empty maybe if the filter apply on the actual value and if maybe was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .filter { it.isNotEmpty() }
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
 }
