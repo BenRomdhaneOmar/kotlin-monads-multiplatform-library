@@ -109,4 +109,31 @@ class EitherTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `map right must transform the initial element if either was initiated as right`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<String, _>(initialElement)
+                .mapRight { it.length }
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(initialElement.length, result)
+    }
+
+    @Test
+    fun `map right must be ignored if either was initiated as left`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<String, String>(initialElement)
+                .mapRight { it.length }
+                .left()
+
+        assertTrue { result }
+    }
 }

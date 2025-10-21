@@ -6,6 +6,7 @@ sealed interface Either<LEFT, RIGHT> {
     fun left() = right().not()
     fun toMaybeRight(): Maybe<RIGHT>
     fun toMaybeLeft(): Maybe<LEFT>
+    fun <NEW_RIGHT> mapRight(mapper: (RIGHT) -> NEW_RIGHT): Either<LEFT, NEW_RIGHT>
 
     @ConsistentCopyVisibility
     data class Right<LEFT, RIGHT> private constructor(
@@ -15,6 +16,7 @@ sealed interface Either<LEFT, RIGHT> {
         override fun right() = true
         override fun toMaybeRight() = Maybe.NotEmpty.of(this.right)
         override fun toMaybeLeft() = Maybe.Empty.of<LEFT>()
+        override fun <NEW_RIGHT> mapRight(mapper: (RIGHT) -> NEW_RIGHT) = Right<LEFT, _>(mapper(this.right))
 
         companion object Builder {
 
@@ -33,6 +35,7 @@ sealed interface Either<LEFT, RIGHT> {
         override fun right() = false
         override fun toMaybeRight() = Maybe.Empty.of<RIGHT>()
         override fun toMaybeLeft() = Maybe.NotEmpty.of(this.left)
+        override fun <NEW_RIGHT> mapRight(mapper: (RIGHT) -> NEW_RIGHT) = Left<_, NEW_RIGHT>(this.left)
 
         companion object Builder {
 
