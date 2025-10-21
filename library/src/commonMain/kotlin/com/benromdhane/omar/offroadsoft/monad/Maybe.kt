@@ -12,6 +12,7 @@ sealed interface Maybe<ELEMENT> {
     fun <NEW_ELEMENT> map(mapper: (ELEMENT) -> NEW_ELEMENT): Maybe<NEW_ELEMENT>
     fun <NEW_ELEMENT> flatMap(mapper: (ELEMENT) -> Maybe<NEW_ELEMENT>): Maybe<NEW_ELEMENT>
     fun filter(condition: (ELEMENT) -> Boolean): Maybe<ELEMENT>
+    fun filterNot(condition: (ELEMENT) -> Boolean): Maybe<ELEMENT>
 
     class Empty<ELEMENT> private constructor() : Maybe<ELEMENT> {
 
@@ -22,6 +23,7 @@ sealed interface Maybe<ELEMENT> {
         override fun <NEW_ELEMENT> map(mapper: (ELEMENT) -> NEW_ELEMENT) = Empty<NEW_ELEMENT>()
         override fun <NEW_ELEMENT> flatMap(mapper: (ELEMENT) -> Maybe<NEW_ELEMENT>) = Empty<NEW_ELEMENT>()
         override fun filter(condition: (ELEMENT) -> Boolean) = this
+        override fun filterNot(condition: (ELEMENT) -> Boolean) = this
 
         companion object Builder {
 
@@ -44,6 +46,12 @@ sealed interface Maybe<ELEMENT> {
         override fun <NEW_ELEMENT> flatMap(mapper: (ELEMENT) -> Maybe<NEW_ELEMENT>) = mapper(this.element)
         override fun filter(condition: (ELEMENT) -> Boolean) =
             if (condition(this.element))
+                this
+            else
+                Empty.of()
+
+        override fun filterNot(condition: (ELEMENT) -> Boolean) =
+            if (condition(this.element).not())
                 this
             else
                 Empty.of()
