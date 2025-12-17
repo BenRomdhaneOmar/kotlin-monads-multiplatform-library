@@ -15,6 +15,7 @@ sealed interface Either<LEFT, RIGHT> {
     fun toRight(alternative: RIGHT): Either<LEFT, RIGHT>
     fun toRight(alternative: () -> RIGHT): Either<LEFT, RIGHT>
     fun toLeft(alternative: LEFT): Either<LEFT, RIGHT>
+    fun toLeft(alternative: () -> LEFT): Either<LEFT, RIGHT>
 
     @ConsistentCopyVisibility
     data class Right<LEFT, RIGHT> private constructor(
@@ -48,7 +49,8 @@ sealed interface Either<LEFT, RIGHT> {
         override fun filterLeft(rightAlternative: () -> RIGHT, condition: (LEFT) -> Boolean) = this
         override fun toRight(alternative: RIGHT) = this
         override fun toRight(alternative: () -> RIGHT) = this
-        override fun toLeft(alternative: LEFT) = Left.of<_, RIGHT>(alternative)
+        override fun toLeft(alternative: LEFT) = toLeft { alternative }
+        override fun toLeft(alternative: () -> LEFT) = Left.of<_, RIGHT>(alternative())
 
         companion object Builder {
 
@@ -89,6 +91,7 @@ sealed interface Either<LEFT, RIGHT> {
         override fun toRight(alternative: RIGHT) = toRight { alternative }
         override fun toRight(alternative: () -> RIGHT) = Right.of<LEFT, _>(alternative())
         override fun toLeft(alternative: LEFT) = this
+        override fun toLeft(alternative: () -> LEFT) = this
 
         companion object Builder {
 
