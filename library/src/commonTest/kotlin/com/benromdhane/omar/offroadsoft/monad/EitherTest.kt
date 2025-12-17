@@ -277,4 +277,49 @@ class EitherTest {
             assertEquals(alternativeSeed, result)
         }
     }
+
+    @Test
+    fun `filter left must be ignored if either was initiated as right`() {
+        val initialElement = Uuid.random().toString()
+        val alternative = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<String, _>(initialElement)
+                .filterLeft(alternative) { it.isEmpty() }
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `filter left must be ignored if either was initiated as left with a value that is valid for the filter`() {
+        val initialElement = Uuid.random().toString()
+        val alternative = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<_, String>(initialElement)
+                .filterLeft(alternative) { it.isNotEmpty() }
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `filter left must return right either if initial either was initiated as left with a value that is not valid for the filter`() {
+        val initialElement = Uuid.random().toString()
+        val alternative = Random.nextInt()
+        val result =
+            Either
+                .Left
+                .of<_, Int>(initialElement)
+                .filterLeft(alternative) { it.isEmpty() }
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(alternative, result)
+    }
 }
