@@ -1,5 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad
 
+import io.kotest.assertions.assertSoftly
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -208,5 +209,72 @@ class EitherTest {
                 .orNull()!!
 
         assertEquals(alternative, result)
+    }
+
+    @Test
+    fun `filter right with left value seed must be ignored if either was initiated as left`() {
+        val initialElement = Uuid.random().toString()
+        var evaluated = false
+        val alternative = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Either
+                .Left
+                .of<_, String>(initialElement)
+                .filterRight(alternative) { it.isEmpty() }
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialElement, result)
+        }
+    }
+
+    @Test
+    fun `filter right with left value seed must be ignored if either was initiated as right with a value that is valid for the filter`() {
+        val initialElement = Uuid.random().toString()
+        var evaluated = false
+        val alternative = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Either
+                .Right
+                .of<String, _>(initialElement)
+                .filterRight(alternative) { it.isNotEmpty() }
+                .toMaybeRight()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialElement, result)
+        }
+    }
+
+    @Test
+    fun `filter right with left value seed must return left either if initial either was initiated as right with a value that is not valid for the filter`() {
+        val initialElement = Uuid.random().toString()
+        var evaluated = false
+        val alternativeSeed = Random.nextInt()
+        val alternative = {
+            evaluated = true
+            alternativeSeed
+        }
+        val result =
+            Either
+                .Right
+                .of<Int, _>(initialElement)
+                .filterRight(alternative) { it.isEmpty() }
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeSeed, result)
+        }
     }
 }
