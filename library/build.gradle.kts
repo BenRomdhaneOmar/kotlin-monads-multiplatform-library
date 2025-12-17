@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -11,7 +10,12 @@ group = "com.benromdhane.omar.offroadsoft"
 version = "0.0.1"
 
 kotlin {
-    jvm()
+    jvm {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_25)
+        }
+    }
+    jvmToolchain(25)
     androidLibrary {
         namespace = "com.benromdhane.omar.offroadsoft.monads"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -24,10 +28,12 @@ kotlin {
         }
 
         compilations.configureEach {
-            compilerOptions.configure {
-                jvmTarget.set(
-                    JvmTarget.JVM_21
-                )
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(
+                        JvmTarget.JVM_25
+                    )
+                }
             }
         }
     }
@@ -46,6 +52,7 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotest.assertions.core)
         }
         val androidDeviceTest by getting {
             dependencies {
