@@ -322,4 +322,71 @@ class EitherTest {
 
         assertEquals(alternative, result)
     }
+
+    @Test
+    fun `filter left with right value seed must be ignored if either was initiated as right`() {
+        val initialElement = Uuid.random().toString()
+        var evaluated = false
+        val alternative = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Either
+                .Right
+                .of<String, _>(initialElement)
+                .filterLeft(alternative) { it.isEmpty() }
+                .toMaybeRight()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialElement, result)
+        }
+    }
+
+    @Test
+    fun `filter left with right value seed must be ignored if either was initiated as left with a value that is valid for the filter`() {
+        val initialElement = Uuid.random().toString()
+        var evaluated = false
+        val alternative = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Either
+                .Left
+                .of<_, String>(initialElement)
+                .filterLeft(alternative) { it.isNotEmpty() }
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialElement, result)
+        }
+    }
+
+    @Test
+    fun `filter left with right value seed must return right either if initial either was initiated as left with a value that is not valid for the filter`() {
+        val initialElement = Uuid.random().toString()
+        var evaluated = false
+        val alternativeSeed = Random.nextInt()
+        val alternative = {
+            evaluated = true
+            alternativeSeed
+        }
+        val result =
+            Either
+                .Left
+                .of<_, Int>(initialElement)
+                .filterLeft(alternative) { it.isEmpty() }
+                .toMaybeRight()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeSeed, result)
+        }
+    }
 }
