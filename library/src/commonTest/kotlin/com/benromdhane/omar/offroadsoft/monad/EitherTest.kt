@@ -419,4 +419,49 @@ class EitherTest {
 
         assertEquals(alternative, result)
     }
+
+    @Test
+    fun `to right with alternative seed must be ignored if either was initiated as right`() {
+        val initialElement = Uuid.random().toString()
+        var evaluated = false
+        val alternative = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Either
+                .Right
+                .of<String, _>(initialElement)
+                .toRight(alternative)
+                .toMaybeRight()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialElement, result)
+        }
+    }
+
+    @Test
+    fun `to right with alternative seed must return right either with alternative value if either was initiated as left`() {
+        val initialElement = Uuid.random().toString()
+        var evaluated = false
+        val alternativeSeed = Uuid.random().toString()
+        val alternative = {
+            evaluated = true
+            alternativeSeed
+        }
+        val result =
+            Either
+                .Left
+                .of<_, String>(initialElement)
+                .toRight(alternative)
+                .toMaybeRight()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeSeed, result)
+        }
+    }
 }
