@@ -1,5 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad
 
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -130,7 +131,7 @@ class EitherTest {
         val result =
             Either
                 .Left
-                .of<String, String>(initialElement)
+                .of<_, String>(initialElement)
                 .mapRight { it.length }
                 .left()
 
@@ -157,10 +158,55 @@ class EitherTest {
         val result =
             Either
                 .Right
-                .of<String, String>(initialElement)
+                .of<String, _>(initialElement)
                 .mapLeft { it.length }
                 .right()
 
         assertTrue { result }
+    }
+
+    @Test
+    fun `filter right must be ignored if either was initiated as left`() {
+        val initialElement = Uuid.random().toString()
+        val alternative = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<_, String>(initialElement)
+                .filterRight(alternative) { it.isEmpty() }
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `filter right must be ignored if either was initiated as right with a value that is valid for the filter`() {
+        val initialElement = Uuid.random().toString()
+        val alternative = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<String, _>(initialElement)
+                .filterRight(alternative) { it.isNotEmpty() }
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `filter right must return left either if initial either was initiated as right with a value that is not valid for the filter`() {
+        val initialElement = Uuid.random().toString()
+        val alternative = Random.nextInt()
+        val result =
+            Either
+                .Right
+                .of<Int, _>(initialElement)
+                .filterRight(alternative) { it.isEmpty() }
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(alternative, result)
     }
 }
