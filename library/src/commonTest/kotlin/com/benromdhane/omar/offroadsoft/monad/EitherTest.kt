@@ -541,7 +541,7 @@ class EitherTest {
     }
 
     @Test
-    fun `flat map right must transform the initial element if either was initiated as right and the result of the mapping is either with same left element type`() {
+    fun `flat map right must transform the initial element if either was initiated as right and the result of the mapping is right either with same left element type`() {
         val initialElement = Uuid.random().toString()
         val result =
             Either
@@ -555,7 +555,22 @@ class EitherTest {
     }
 
     @Test
-    fun `flat map right must be ignored if either was initiated as left`() {
+    fun `flat map right must transform the initial element if either was initiated as right and the result of the mapping is left either with same left element type`() {
+        val initialElement = Uuid.random().toString()
+        val finalValue = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<String, _>(initialElement)
+                .flatMapRight { Either.Left.of<_, Int>(finalValue) }
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(finalValue, result)
+    }
+
+    @Test
+    fun `flat map right with result mapping left either must be ignored if either was initiated as left`() {
         val initialElement = Uuid.random().toString()
         val result =
             Either
@@ -569,7 +584,21 @@ class EitherTest {
     }
 
     @Test
-    fun `flat map left must transform the initial element if either was initiated as left and the result of the mapping is either with same right element type`() {
+    fun `flat map right with result mapping right either must be ignored if either was initiated as left`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<_, String>(initialElement)
+                .flatMapRight { Either.Right.of(it.length) }
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `flat map left must transform the initial element if either was initiated as left and the result of the mapping is left either with same right element type`() {
         val initialElement = Uuid.random().toString()
         val result =
             Either
@@ -583,13 +612,42 @@ class EitherTest {
     }
 
     @Test
-    fun `flat map left must be ignored if either was initiated as right`() {
+    fun `flat map left must transform the initial element if either was initiated as left and the result of the mapping is right either with same right element type`() {
+        val initialElement = Uuid.random().toString()
+        val finalValue = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<_, String>(initialElement)
+                .flatMapLeft { Either.Right.of<Int, String>(finalValue) }
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(finalValue, result)
+    }
+
+    @Test
+    fun `flat map left with result mapping right either must be ignored if either was initiated as right`() {
         val initialElement = Uuid.random().toString()
         val result =
             Either
                 .Right
                 .of<String, _>(initialElement)
                 .flatMapLeft { Either.Right.of<String, _>(it + Uuid.random().toString()) }
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `flat map left with result mapping left either must be ignored if either was initiated as right`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<String, _>(initialElement)
+                .flatMapLeft { Either.Left.of(it + Uuid.random().toString()) }
                 .toMaybeRight()
                 .orNull()!!
 
