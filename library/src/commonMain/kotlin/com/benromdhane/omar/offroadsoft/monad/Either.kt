@@ -115,3 +115,9 @@ fun <LEFT, RIGHT> Either<LEFT, Either<LEFT, RIGHT>>.flatten() = this.flatMapRigh
 
 @JvmName("flattenLeft")
 fun <LEFT, RIGHT> Either<Either<LEFT, RIGHT>, RIGHT>.flatten() = this.flatMapLeft { it }
+fun <LEFT, RIGHT> Either<Either<LEFT, RIGHT>, Either<LEFT, RIGHT>>.flatten() =
+    (
+            if (this.right()) this.toMaybeRight()
+            else this.toMaybeLeft()
+            )
+        .orNull()!!

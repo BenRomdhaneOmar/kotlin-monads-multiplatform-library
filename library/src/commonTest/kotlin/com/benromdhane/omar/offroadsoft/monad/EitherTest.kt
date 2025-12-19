@@ -709,4 +709,60 @@ class EitherTest {
 
         assertEquals(initialElement, result)
     }
+
+    @Test
+    fun `flatten for either with both sides as either with uniform types must transform the initial composed type either to flat type either if the it was initiated as left either of left either`() {
+        val initialElement = Random.nextInt()
+        val result =
+            Either
+                .Left
+                .of<_, Either<Int, String>>(Either.Left.of<_, String>(initialElement))
+                .flatten()
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `flatten for either with both sides as either with uniform types must transform the initial composed type either to flat type either if the it was initiated as left either of right either`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<_, Either<Int, String>>(Either.Right.of<Int, _>(initialElement))
+                .flatten()
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `flatten for either with both sides as either with uniform types must transform the initial composed type either to flat type either if the it was initiated as right either of left either`() {
+        val initialElement = Random.nextInt()
+        val result =
+            Either
+                .Right
+                .of<Either<Int, String>, _>(Either.Left.of<_, String>(initialElement))
+                .flatten()
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `flatten for either with both sides as either with uniform types must transform the initial composed type either to flat type either if the it was initiated as right either of right either`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<Either<Int, String>, _>(Either.Right.of<Int, _>(initialElement))
+                .flatten()
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
 }
