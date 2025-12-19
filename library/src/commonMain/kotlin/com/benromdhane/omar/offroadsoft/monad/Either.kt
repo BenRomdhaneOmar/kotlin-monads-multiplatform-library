@@ -135,3 +135,12 @@ fun <RESULT> Either<RESULT, RESULT>.fold() =
             else this.toMaybeLeft()
             )
         .orNull()!!
+
+fun <TYPE, RESULT> Either<TYPE, TYPE>.fold(mapper: (TYPE) -> RESULT) =
+    mapper(
+        (
+                if (this.right()) this.toMaybeRight()
+                else this.toMaybeLeft()
+                )
+            .orNull()!!
+    )
