@@ -871,4 +871,43 @@ class EitherTest {
 
         assertEquals(initialElement.length, result)
     }
+
+    @Test
+    fun `to filtered maybe right must return empty maybe if either was initiated as left either`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<_, String>(initialElement)
+                .toFilteredMaybeRight { it.length == 5 }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe right must return empty maybe if either was initiated as right with a value that is not valid for the filter`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<Int, _>(initialElement)
+                .toFilteredMaybeRight { it.isEmpty() }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe right must return maybe contains initial value if either was initiated as right with a value that is valid for the filter`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<Int, _>(initialElement)
+                .toFilteredMaybeRight { it.isNotEmpty() }
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
 }

@@ -144,3 +144,7 @@ fun <TYPE, RESULT> Either<TYPE, TYPE>.fold(mapper: (TYPE) -> RESULT) =
                 )
             .orNull()!!
     )
+
+fun <LEFT, RIGHT> Either<LEFT, RIGHT>.toFilteredMaybeRight(condition: (RIGHT) -> Boolean): Maybe<RIGHT> =
+    this.toMaybeRight()
+        .filter(condition)
