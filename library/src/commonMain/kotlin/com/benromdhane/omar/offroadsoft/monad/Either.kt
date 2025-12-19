@@ -158,3 +158,7 @@ fun <ELEMENT> Either<ELEMENT, ELEMENT>.toFilteredMaybe(condition: (ELEMENT) -> B
             else this.toMaybeLeft()
             )
         .filter(condition)
+
+fun <ELEMENT> Either<ELEMENT, ELEMENT>.toMaybe() =
+    if (this.right()) this.toMaybeRight()
+    else this.toMaybeLeft()
