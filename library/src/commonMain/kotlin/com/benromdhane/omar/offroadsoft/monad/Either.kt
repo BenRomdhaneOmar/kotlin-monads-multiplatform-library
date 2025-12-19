@@ -1,5 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad
 
+import kotlin.jvm.JvmName
+
 sealed interface Either<LEFT, RIGHT> {
 
     fun right(): Boolean
@@ -108,4 +110,8 @@ sealed interface Either<LEFT, RIGHT> {
     }
 }
 
+@JvmName("flattenRight")
 fun <LEFT, RIGHT> Either<LEFT, Either<LEFT, RIGHT>>.flatten() = this.flatMapRight { it }
+
+@JvmName("flattenLeft")
+fun <LEFT, RIGHT> Either<Either<LEFT, RIGHT>, RIGHT>.flatten() = this.flatMapLeft { it }
