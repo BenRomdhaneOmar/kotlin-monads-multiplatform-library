@@ -539,4 +539,32 @@ class EitherTest {
             assertEquals(alternativeSeed, result)
         }
     }
+
+    @Test
+    fun `flat map right must transform the initial element if either was initiated as right and the result of the mapping is either with same left element type`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<String, _>(initialElement)
+                .flatMapRight { Either.Right.of(it.length) }
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(initialElement.length, result)
+    }
+
+    @Test
+    fun `flat map right must be ignored if either was initiated as left`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<_, String>(initialElement)
+                .flatMapRight { Either.Left.of<_, String>(it + Uuid.random().toString()) }
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
 }
