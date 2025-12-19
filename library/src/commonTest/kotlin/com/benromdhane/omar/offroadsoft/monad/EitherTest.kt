@@ -595,4 +595,32 @@ class EitherTest {
 
         assertEquals(initialElement, result)
     }
+
+    @Test
+    fun `flatten for either with right side as either with uniform types must transform the initial composed type either to flat type either if it was initiated as right`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<Int, _>(Either.Right.of<Int, _>(initialElement))
+                .flatten()
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `flatten for either with right side as either with uniform types must transform the initial composed type either to flat type either if it was initiated as left`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<String, _>(Either.Left.of<_, Int>(initialElement))
+                .flatten()
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
 }

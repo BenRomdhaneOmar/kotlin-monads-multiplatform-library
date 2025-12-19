@@ -107,3 +107,5 @@ sealed interface Either<LEFT, RIGHT> {
         }
     }
 }
+
+fun <LEFT, RIGHT> Either<LEFT, Either<LEFT, RIGHT>>.flatten() = this.flatMapRight { it }
