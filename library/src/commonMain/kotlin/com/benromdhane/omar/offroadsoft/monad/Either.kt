@@ -21,6 +21,7 @@ sealed interface Either<LEFT, RIGHT> {
     fun <NEW_RIGHT> flatMapRight(mapper: (RIGHT) -> Either<LEFT, NEW_RIGHT>): Either<LEFT, NEW_RIGHT>
     fun <NEW_LEFT> flatMapLeft(mapper: (LEFT) -> Either<NEW_LEFT, RIGHT>): Either<NEW_LEFT, RIGHT>
     fun switch(): Either<RIGHT, LEFT>
+    fun <RESULT> fold(rightMapper: (RIGHT) -> RESULT, leftMapper: (LEFT) -> RESULT): RESULT
 
     @ConsistentCopyVisibility
     data class Right<LEFT, RIGHT> private constructor(
@@ -59,6 +60,8 @@ sealed interface Either<LEFT, RIGHT> {
         override fun <NEW_RIGHT> flatMapRight(mapper: (RIGHT) -> Either<LEFT, NEW_RIGHT>) = mapper(this.right)
         override fun <NEW_LEFT> flatMapLeft(mapper: (LEFT) -> Either<NEW_LEFT, RIGHT>) = Right<NEW_LEFT, _>(this.right)
         override fun switch() = Left.of<_, LEFT>(this.right)
+        override fun <RESULT> fold(rightMapper: (RIGHT) -> RESULT, leftMapper: (LEFT) -> RESULT) =
+            rightMapper(this.right)
 
         companion object Builder {
 
@@ -105,6 +108,7 @@ sealed interface Either<LEFT, RIGHT> {
 
         override fun <NEW_LEFT> flatMapLeft(mapper: (LEFT) -> Either<NEW_LEFT, RIGHT>) = mapper(this.left)
         override fun switch() = Right.of<RIGHT, _>(this.left)
+        override fun <RESULT> fold(rightMapper: (RIGHT) -> RESULT, leftMapper: (LEFT) -> RESULT) = leftMapper(this.left)
 
         companion object Builder {
 

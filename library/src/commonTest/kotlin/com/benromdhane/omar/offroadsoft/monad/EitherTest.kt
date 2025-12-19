@@ -793,4 +793,34 @@ class EitherTest {
 
         assertEquals(initialElement, result)
     }
+
+    @Test
+    fun `fold must return right mapper transformation if either was initiated as right`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<Int, _>(initialElement)
+                .fold(
+                    { it },
+                    { it.toString() }
+                )
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `fold must return left mapper transformation if either was initiated as left`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<_, Int>(initialElement)
+                .fold(
+                    { it.toString() },
+                    { it }
+                )
+
+        assertEquals(initialElement, result)
+    }
 }
