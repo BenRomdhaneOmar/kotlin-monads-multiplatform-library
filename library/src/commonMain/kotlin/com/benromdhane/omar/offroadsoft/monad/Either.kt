@@ -128,3 +128,10 @@ fun <LEFT, RIGHT> Either<Either<LEFT, RIGHT>, Either<LEFT, RIGHT>>.flatten() =
             else this.toMaybeLeft()
             )
         .orNull()!!
+
+fun <RESULT> Either<RESULT, RESULT>.fold() =
+    (
+            if (this.right()) this.toMaybeRight()
+            else this.toMaybeLeft()
+            )
+        .orNull()!!

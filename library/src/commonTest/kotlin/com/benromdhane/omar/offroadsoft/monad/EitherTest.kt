@@ -823,4 +823,28 @@ class EitherTest {
 
         assertEquals(initialElement, result)
     }
+
+    @Test
+    fun `fold must return right value if either was initiated as right with same left and right types`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<String, _>(initialElement)
+                .fold()
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `fold must return left value if either was initiated as left with same left and right types`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<_, String>(initialElement)
+                .fold()
+
+        assertEquals(initialElement, result)
+    }
 }
