@@ -24,8 +24,7 @@ jobs:
           java-version: '25'
           cache: 'gradle'
           cache-dependency-path: | 
-            sub-project/*.gradle*
-            sub-project/**/gradle-wrapper.properties
+            *.gradle*
       - run: echo "The ${{ github.repository }} repository being tested for wasm js browser."
       - run: ./gradlew clean wasmJsBrowserTest
       - run: echo "The ${{ github.repository }} repository being tested for wasm js."
