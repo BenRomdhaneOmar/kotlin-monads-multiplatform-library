@@ -5,7 +5,7 @@ on:
     branches: [ dev ]
 jobs:
   Test-Dev-Actions:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     env:
@@ -17,15 +17,14 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - name: Set up Java 25
-        uses: actions/setup-java@v5
-        with:
-          distribution: 'temurin'
-          java-version: '25'
-          cache: 'gradle'
+        run: echo "JAVA_HOME=$JAVA_HOME_25_X64" >> $GITHUB_ENV
+      - name: Set up gradle
+        run: ./gradlew -version
+      - name: wasm Js Browser Test
+        run: ./gradlew clean wasmJsBrowserTest
       - name: wasm Js Test
         run: ./gradlew clean wasmJsTest
       - name: linux X64 Test
         run: ./gradlew clean linuxX64Test
       - name: jvm Test
         run: ./gradlew clean jvmTest
-      - run: echo "This job's status is ${{ job.status }}."
