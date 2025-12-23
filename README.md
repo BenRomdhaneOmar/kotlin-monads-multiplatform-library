@@ -1,5 +1,7 @@
 # Kotlin Monads library
 
+[![Test developing version](https://github.com/BenRomdhaneOmar/kotlin-monads-multiplatform-library/actions/workflows/dev-test.yaml/badge.svg)](https://github.com/BenRomdhaneOmar/kotlin-monads-multiplatform-library/actions/workflows/dev-test.yaml)
+
 ## Run tests for all targets:
 
 ```shell
