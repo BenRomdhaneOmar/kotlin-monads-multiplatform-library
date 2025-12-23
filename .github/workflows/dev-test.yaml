@@ -16,13 +16,37 @@ jobs:
           ls ${{ github.workspace }}
       - name: Set up Java 25
         run: echo "JAVA_HOME=$JAVA_HOME_25_X64" >> $GITHUB_ENV
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
       - name: Set up gradle
         run: ./gradlew -version
-      - name: wasm Js Browser Test
+      - name: Wasm Js Browser Test
         run: ./gradlew clean wasmJsBrowserTest
-      - name: wasm Js Test
+      - name: Wasm Js Test
         run: ./gradlew clean wasmJsTest
-      - name: linux X64 Test
+      - name: Linux X64 Test
         run: ./gradlew clean linuxX64Test
-      - name: jvm Test
+      - name: Jvm Test
         run: ./gradlew clean jvmTest
+      - name: Cache SonarQube packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Generate Kover reports
+        run: ./gradlew koverXmlReport
+      - name: Run SonarCloud Analysis
+        run: |
+          ./gradlew sonar \
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+            -Dsonar.organization=${{ secrets.SONAR_ORG }} \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Run Detekt Analysis
+        run: ./gradlew detekt
