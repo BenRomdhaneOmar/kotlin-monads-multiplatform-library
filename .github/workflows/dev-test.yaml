@@ -9,28 +9,23 @@ jobs:
     permissions:
       contents: read
     steps:
-      - run: echo "The name of the branch is ${{ github.ref }} and the repository is ${{ github.repository }}."
       - name: Check out repository code
         uses: actions/checkout@v5
-      - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
-      - run: echo "Enabling Java."
       - name: Set up Java 25
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '25'
           cache: 'gradle'
-          cache-dependency-path: | 
-            *.gradle*
-      - run: echo "The ${{ github.repository }} repository being tested for wasm js browser."
-      - run: ./gradlew clean wasmJsBrowserTest
-      - run: echo "The ${{ github.repository }} repository being tested for wasm js."
-      - run: ./gradlew clean wasmJsTest
-      - run: echo "The ${{ github.repository }} repository being tested for linux X64."
-      - run: ./gradlew clean linuxX64Test
-      - run: echo "The ${{ github.repository }} repository being tested for jvm."
-      - run: ./gradlew clean jvmTest
+      - name: wasm Js Browser Test
+        run: ./gradlew clean wasmJsBrowserTest
+      - name: wasm Js Test
+        run: ./gradlew clean wasmJsTest
+      - name: linux X64 Test
+        run: ./gradlew clean linuxX64Test
+      - name: jvm Test
+        run: ./gradlew clean jvmTest
       - run: echo "This job's status is ${{ job.status }}."
