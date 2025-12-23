@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       contents: read
+    env:
+      KOTLIN_JS_USE_PLATFORM_PATHS: true
     steps:
       - name: Check out repository code
         uses: actions/checkout@v5
