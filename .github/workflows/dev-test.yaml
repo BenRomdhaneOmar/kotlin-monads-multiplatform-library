@@ -22,8 +22,6 @@ jobs:
           distribution: 'temurin'
           java-version: '25'
           cache: 'gradle'
-      - name: wasm Js Browser Test
-        run: ./gradlew clean wasmJsBrowserTest
       - name: wasm Js Test
         run: ./gradlew clean wasmJsTest
       - name: linux X64 Test
