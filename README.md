@@ -1,6 +1,7 @@
 # Kotlin Monads library
 
 [![Test developing version](https://github.com/BenRomdhaneOmar/kotlin-monads-multiplatform-library/actions/workflows/dev-test.yaml/badge.svg)](https://github.com/BenRomdhaneOmar/kotlin-monads-multiplatform-library/actions/workflows/dev-test.yaml)
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=BenRomdhaneOmar_kotlin-monads-multiplatform-library)](https://sonarcloud.io/summary/new_code?id=BenRomdhaneOmar_kotlin-monads-multiplatform-library)
 
 ## Run tests for all targets:
 
