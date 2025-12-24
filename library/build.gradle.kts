@@ -1,9 +1,18 @@
+import dev.detekt.gradle.Detekt
+import dev.detekt.gradle.DetektCreateBaselineTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.vanniktech.mavenPublish)
+    alias(libs.plugins.sonarqube)
+    alias(libs.plugins.kover)
+    alias(libs.plugins.detekt)
+}
+
+repositories {
+    mavenCentral()
 }
 
 group = "com.benromdhane.omar.offroadsoft"
@@ -67,6 +76,53 @@ kotlin {
 
             }
         }
+    }
+
+    kover {
+        reports {
+        }
+    }
+    detekt {
+        buildUponDefaultConfig = true
+        allRules = false
+        config.setFrom("$projectDir/detekt-config/detekt.yml")
+        baseline = file("$projectDir/detekt-config/baseline.xml")
+    }
+    tasks.withType<Detekt>().configureEach {
+        reports {
+            html.required.set(true)
+            checkstyle.required.set(true)
+            sarif.required.set(true)
+            markdown.required.set(true)
+        }
+    }
+    tasks.withType<Detekt>().configureEach {
+        jvmTarget = "25"
+    }
+    tasks.withType<DetektCreateBaselineTask>().configureEach {
+        jvmTarget = "25"
+    }
+
+    sonarqube {
+        properties {
+            val koverReport =
+                allprojects.mapNotNull { project ->
+                    val reportPath = "${project.projectDir}/build/reports/kover/report.xml"
+                    if (File(reportPath).exists()) reportPath else null
+                }
+                    .joinToString(",")
+            property("sonar.coverage.jacoco.xmlReportPaths", koverReport)
+            val detektReports =
+                allprojects.mapNotNull { project ->
+                    val reportPath = "${project.projectDir}/build/reports/detekt/detekt.xml"
+                    if (File(reportPath).exists()) reportPath else null
+                }
+                    .joinToString(",")
+            property("sonar.kotlin.detekt.reportPaths", detektReports)
+        }
+    }
+    tasks.named("sonar") {
+        dependsOn(subprojects.map { it.tasks.named("koverXmlReport") })
     }
 }
 

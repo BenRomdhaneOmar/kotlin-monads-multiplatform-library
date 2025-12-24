@@ -8,6 +8,9 @@ android-minSdk = "35"
 android-compileSdk = "36"
 runner = "1.7.0"
 vanniktechMavenPublish = "0.35.0"
+sonarqube = "7.2.2.6593"
+kover = "0.9.4"
+detekt = "2.0.0-alpha.1"
 
 [libraries]
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
@@ -20,3 +23,6 @@ runner = { module = "androidx.test:runner", version.ref = "runner" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 vanniktech-mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "vanniktechMavenPublish" }
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
