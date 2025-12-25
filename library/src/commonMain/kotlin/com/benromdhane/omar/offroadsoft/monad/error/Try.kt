@@ -3,6 +3,7 @@ package com.benromdhane.omar.offroadsoft.monad.error
 sealed interface Try<SUCCESS, EXCEPTION : Throwable> {
 
     fun success(): Boolean
+    fun failure() = success().not()
 
     companion object Of {
 

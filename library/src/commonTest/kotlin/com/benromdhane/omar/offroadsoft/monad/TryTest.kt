@@ -26,4 +26,24 @@ class TryTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `failure must return true if try was initiated as failure`() {
+        val initialValue = Exception()
+        val result =
+            Try.seed<Int, _>(initialValue)
+                .failure()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `failure must return false if try was initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Try.seed<_, Throwable>(initialValue)
+                .failure()
+
+        assertFalse { result }
+    }
 }
