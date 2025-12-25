@@ -7,8 +7,14 @@ sealed interface Try<SUCCESS, EXCEPTION : Throwable> {
 
     companion object Of {
 
-        fun <SUCCESS, EXCEPTION : Throwable> seed(seed: SUCCESS) = Success.of<SUCCESS, EXCEPTION>(seed)
-        fun <SUCCESS, EXCEPTION : Throwable> seed(seed: EXCEPTION) = Failure.of<SUCCESS, EXCEPTION>(seed)
+        fun <SUCCESS> seed(seed: SUCCESS) = Success.of<SUCCESS, Throwable>(seed)
+        fun <SUCCESS> seed(seed: Throwable) = Failure.of<SUCCESS, Throwable>(seed)
+        fun <SUCCESS> trying(provider: () -> SUCCESS): Try<SUCCESS, Throwable> =
+            try {
+                Success.of(provider())
+            } catch (throwable: Throwable) {
+                Failure.of(throwable)
+            }
     }
 
     @ConsistentCopyVisibility
