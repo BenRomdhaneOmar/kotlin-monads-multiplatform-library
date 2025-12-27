@@ -167,4 +167,29 @@ class TryTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `map failure must return success if initial try was initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Try.seed(initialValue)
+                .mapFailure { Exception(Uuid.random().toString()) }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `map failure must return transformed failure if initial try was initiated as failure`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val alternativeValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<Int>(initialValue)
+                .mapFailure { alternativeValue }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(alternativeValue, result)
+    }
 }

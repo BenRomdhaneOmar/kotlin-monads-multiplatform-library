@@ -9,6 +9,7 @@ sealed interface Try<SUCCESS> {
     fun toMaybeSuccess(): Maybe<SUCCESS>
     fun toMaybeFailure(): Maybe<Throwable>
     fun <NEW_SUCCESS> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS): Try<NEW_SUCCESS>
+    fun mapFailure(mapper: (Throwable) -> Throwable): Try<SUCCESS>
 
     companion object Of {
 
@@ -39,6 +40,8 @@ sealed interface Try<SUCCESS> {
                 Failure.of(throwable)
             }
 
+        override fun mapFailure(mapper: (Throwable) -> Throwable) = this
+
         companion object Builder {
 
             fun <SUCCESS> of(
@@ -59,6 +62,7 @@ sealed interface Try<SUCCESS> {
         override fun toMaybeSuccess() = Maybe.Empty.of<SUCCESS>()
         override fun toMaybeFailure() = Maybe.NotEmpty.of(this.failure)
         override fun <NEW_SUCCESS> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS) = Failure<NEW_SUCCESS>(this.failure)
+        override fun mapFailure(mapper: (Throwable) -> Throwable) = Failure<SUCCESS>(mapper(this.failure))
 
         companion object Builder {
 
