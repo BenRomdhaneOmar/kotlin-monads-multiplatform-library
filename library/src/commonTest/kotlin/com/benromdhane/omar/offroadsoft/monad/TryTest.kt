@@ -90,7 +90,7 @@ class TryTest {
         val result =
             Try.seed(initialValue)
                 .toMaybeSuccess()
-                .orNull()
+                .orNull()!!
 
         assertEquals(initialValue, result)
     }
@@ -112,7 +112,58 @@ class TryTest {
         val result =
             Try.seed<Int>(initialValue)
                 .toMaybeFailure()
-                .orNull()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `map success must return transformed value if initial try was initiated as success and mapping operation does not throw any exception`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Try.seed(initialValue)
+                .mapSuccess { it.length }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue.length, result)
+    }
+
+    @Test
+    fun `map success must return failure if initial try was initiated as success and mapping operation throws an exception`() {
+        val initialValue = Uuid.random().toString()
+
+        @Suppress("DIVISION_BY_ZERO")
+        val result =
+            Try.seed(initialValue)
+                .mapSuccess { it.length / 0 }
+                .failure()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `map success must return failure if initial try was initiated as failure and mapping operation does not throw any exception`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<String>(initialValue)
+                .mapSuccess { it.length }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `map success must return failure if initial try was initiated as failure and mapping operation throws an exception`() {
+        val initialValue = Exception(Uuid.random().toString())
+
+        @Suppress("DIVISION_BY_ZERO")
+        val result =
+            Try.seed<String>(initialValue)
+                .mapSuccess { it.length / 0 }
+                .toMaybeFailure()
+                .orNull()!!
 
         assertEquals(initialValue, result)
     }
