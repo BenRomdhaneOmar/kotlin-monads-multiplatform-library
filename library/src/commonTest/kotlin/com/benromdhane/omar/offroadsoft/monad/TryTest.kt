@@ -54,6 +54,7 @@ class TryTest {
 
     @Test
     fun `trying must return failure if the provided expression throws an exception`() {
+        @Suppress("DIVISION_BY_ZERO")
         val initialValue = { 10 / 0 }
         val result =
             Try.trying(initialValue)
@@ -89,6 +90,28 @@ class TryTest {
         val result =
             Try.seed(initialValue)
                 .toMaybeSuccess()
+                .orNull()
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `to maybe failure must return empty maybe if the initial try was initiated as success`() {
+        val initialValue = Random.nextInt()
+        val result =
+            Try.seed(initialValue)
+                .toMaybeFailure()
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to maybe failure must return maybe with failure throwable if the initial try was initiated as failure`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<Int>(initialValue)
+                .toMaybeFailure()
                 .orNull()
 
         assertEquals(initialValue, result)
