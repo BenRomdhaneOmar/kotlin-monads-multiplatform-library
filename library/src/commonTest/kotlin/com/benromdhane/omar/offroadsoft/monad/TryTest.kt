@@ -192,4 +192,30 @@ class TryTest {
 
         assertEquals(alternativeValue, result)
     }
+
+    @Test
+    fun `recover must return initial value if try was initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        val alternativeValue = Uuid.random().toString()
+        val result =
+            Try.seed(initialValue)
+                .recover(alternativeValue)
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `recover must return alternative value if try was initiated as failure`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val alternativeValue = Uuid.random().toString()
+        val result =
+            Try.seed<String>(initialValue)
+                .recover(alternativeValue)
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(alternativeValue, result)
+    }
 }
