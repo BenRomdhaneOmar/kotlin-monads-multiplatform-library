@@ -7,6 +7,7 @@ sealed interface Try<SUCCESS> {
     fun success(): Boolean
     fun failure() = success().not()
     fun toMaybeSuccess(): Maybe<SUCCESS>
+    fun toMaybeFailure(): Maybe<Throwable>
 
     companion object Of {
 
@@ -27,6 +28,7 @@ sealed interface Try<SUCCESS> {
 
         override fun success() = true
         override fun toMaybeSuccess() = Maybe.NotEmpty.of(this.success)
+        override fun toMaybeFailure() = Maybe.Empty.of<Throwable>()
 
         companion object Builder {
 
@@ -46,6 +48,7 @@ sealed interface Try<SUCCESS> {
 
         override fun success() = false
         override fun toMaybeSuccess() = Maybe.Empty.of<SUCCESS>()
+        override fun toMaybeFailure() = Maybe.NotEmpty.of(this.failure)
 
         companion object Builder {
 
