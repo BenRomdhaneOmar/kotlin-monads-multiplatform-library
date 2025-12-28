@@ -630,4 +630,85 @@ class TryTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `filter success with alternative seed must return initial value if try was initiated as failure and success meet the condition`() {
+        val initialValue = Exception(Uuid.random().toString())
+        var evaluated = false
+        val alternativeValue = {
+            evaluated = true
+            Exception(Uuid.random().toString())
+        }
+        val result =
+            Try.seed<String>(initialValue)
+                .filterSuccess(alternativeValue) { true }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
+    }
+
+    @Test
+    fun `filter success with alternative seed must return initial value if try was initiated as failure and success does not meet the condition`() {
+        val initialValue = Exception(Uuid.random().toString())
+        var evaluated = false
+        val alternativeValue = {
+            evaluated = true
+            Exception(Uuid.random().toString())
+        }
+        val result =
+            Try.seed<String>(initialValue)
+                .filterSuccess(alternativeValue) { false }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
+    }
+
+    @Test
+    fun `filter success with alternative seed must return initial value if try was initiated as success and success meet the condition`() {
+        val initialValue = Uuid.random().toString()
+        var evaluated = false
+        val alternativeValue = {
+            evaluated = true
+            Exception(Uuid.random().toString())
+        }
+        val result =
+            Try.seed(initialValue)
+                .filterSuccess(alternativeValue) { it.isNotEmpty() }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
+    }
+
+    @Test
+    fun `filter success with alternative seed must return alternative failure if try was initiated as success and success does not meet the condition`() {
+        val initialValue = Uuid.random().toString()
+        var evaluated = false
+        val alternativeSeed = Exception(Uuid.random().toString())
+        val alternativeValue = {
+            evaluated = true
+            alternativeSeed
+        }
+        val result =
+            Try.seed(initialValue)
+                .filterSuccess(alternativeValue) { it.isEmpty() }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeSeed, result)
+        }
+    }
 }
