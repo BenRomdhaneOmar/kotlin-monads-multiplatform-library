@@ -36,24 +36,6 @@ jobs:
         run: ./gradlew clean linuxX64Test
       - name: Jvm Test
         run: ./gradlew clean jvmTest
-      - name: Cache SonarQube packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-      - name: Generate Kover reports
-        run: ./gradlew koverXmlReport
-      - name: Run SonarCloud Analysis
-        run: |
-          ./gradlew sonar \
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
-            -Dsonar.organization=${{ secrets.SONAR_ORG }} \
-            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - name: Run Detekt Analysis
-        run: ./gradlew detekt
       - name: Increment version
         id: version
         run: |
@@ -78,3 +60,21 @@ jobs:
           git add gradle.properties
           git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
           git push
+      - name: Run Detekt Analysis
+        run: ./gradlew detekt
+      - name: Cache SonarQube packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Generate Kover reports
+        run: ./gradlew koverXmlReport
+      - name: Run SonarCloud Analysis
+        run: |
+          ./gradlew sonar \
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+            -Dsonar.organization=${{ secrets.SONAR_ORG }} \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
