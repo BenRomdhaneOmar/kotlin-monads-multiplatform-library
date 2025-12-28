@@ -204,3 +204,5 @@ fun <FAILURE : Throwable, SUCCESS> Either<SUCCESS, FAILURE>.asTry() =
         { Try.seed(it) },
         { Try.seed(it) }
     )
+
+fun <SUCCESS> Throwable.asTry() = Try.seed<SUCCESS>(this)
