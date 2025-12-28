@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
 import com.benromdhane.omar.offroadsoft.monad.Maybe
+import kotlin.reflect.KClass
 
 sealed interface Try<SUCCESS> {
 
@@ -13,6 +14,7 @@ sealed interface Try<SUCCESS> {
     fun recover(alternative: SUCCESS): Try<SUCCESS>
     fun recover(alternative: () -> SUCCESS): Try<SUCCESS>
     fun recover(alternative: SUCCESS, condition: (Throwable) -> Boolean): Try<SUCCESS>
+    fun <FAILURE : Throwable> recover(alternative: SUCCESS, failureType: KClass<FAILURE>): Try<SUCCESS>
     fun recover(alternative: () -> SUCCESS, condition: (Throwable) -> Boolean): Try<SUCCESS>
 
     companion object Of {
@@ -48,6 +50,8 @@ sealed interface Try<SUCCESS> {
         override fun recover(alternative: SUCCESS) = this
         override fun recover(alternative: () -> SUCCESS) = this
         override fun recover(alternative: SUCCESS, condition: (Throwable) -> Boolean) = this
+        override fun <FAILURE : Throwable> recover(alternative: SUCCESS, failureType: KClass<FAILURE>) = this
+
         override fun recover(alternative: () -> SUCCESS, condition: (Throwable) -> Boolean) = this
 
         companion object Builder {
@@ -80,6 +84,15 @@ sealed interface Try<SUCCESS> {
             recover(
                 { alternative },
                 condition
+            )
+
+        override fun <FAILURE : Throwable> recover(
+            alternative: SUCCESS,
+            failureType: KClass<FAILURE>
+        ) =
+            recover(
+                { alternative },
+                failureType::isInstance
             )
 
         override fun recover(
