@@ -445,4 +445,85 @@ class TryTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `recover with failure type and alternative seed must return initial value if try was initiated as success and failure meet the condition`() {
+        val initialValue = Uuid.random().toString()
+        var evaluated = false
+        val alternativeValue = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Try.seed(initialValue)
+                .recover(alternativeValue, Throwable::class)
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
+    }
+
+    @Test
+    fun `recover with failure type and alternative seed must return alternative value if try was initiated as failure and failure meet the condition`() {
+        val initialValue = Exception(Uuid.random().toString())
+        var evaluated = false
+        val alternativeSeed = Uuid.random().toString()
+        val alternativeValue = {
+            evaluated = true
+            alternativeSeed
+        }
+        val result =
+            Try.seed<String>(initialValue)
+                .recover(alternativeValue, Exception::class)
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeSeed, result)
+        }
+    }
+
+    @Test
+    fun `recover with failure type and alternative seed must return initial value if try was initiated as success and failure does not meet the condition`() {
+        val initialValue = Uuid.random().toString()
+        var evaluated = false
+        val alternativeValue = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Try.seed(initialValue)
+                .recover(alternativeValue, IllegalArgumentException::class)
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
+    }
+
+    @Test
+    fun `recover with failure type and alternative seed must return initial failure if try was initiated as failure and failure does not meet the condition`() {
+        val initialValue = Exception(Uuid.random().toString())
+        var evaluated = false
+        val alternativeValue = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Try.seed<String>(initialValue)
+                .recover(alternativeValue, IllegalArgumentException::class)
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
+    }
 }
