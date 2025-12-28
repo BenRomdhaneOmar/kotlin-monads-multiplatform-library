@@ -14,6 +14,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           token: ${{ secrets.ACTION_PAT }}
+          fetch-depth: 0
       - name: List files in the repository
         run: |
           ls -lR ${{ github.workspace }}
@@ -56,7 +57,7 @@ jobs:
       - name: Increment version
         id: version
         run: |
-          CURRENT_VERSION=$(grep "^version" ./library/build.gradle.kts | cut -d'"' -f2)
+          CURRENT_VERSION=$(grep "library.version=" gradle.properties | cut -d'=' -f2)
           echo "Current version: $CURRENT_VERSION"
           MAJOR=$(echo "$CURRENT_VERSION" | cut -d'.' -f1)
           echo "Current major: $MAJOR"
@@ -68,16 +69,12 @@ jobs:
           echo "New patch: $PATCH"
           NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
           echo "New version: $NEW_VERSION"
-          sed -i "s/^version =.*/version = \"$NEW_VERSION\"/" ./library/build.gradle.kts
+          sed -i "s/library\.version=.*/library\.version=$NEW_VERSION/" gradle.properties
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
       - name: Commit version bump
         run: |
           git config user.name "kotlin-monads-multiplatform-library-github-actions[bot]"
           git config user.email "kotlin-monads-multiplatform-library-github-actions[bot]@users.noreply.github.com"
           git add ./library/build.gradle.kts
-          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }}"
+          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
           git push
-      - name: Create Git tag
-        run: |
-          git tag "v${{ steps.version.outputs.new_version }}"
-          git push origin "v${{ steps.version.outputs.new_version }}"

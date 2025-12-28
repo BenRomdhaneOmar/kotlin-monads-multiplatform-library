@@ -16,7 +16,7 @@ repositories {
 }
 
 group = "com.benromdhane.omar.offroadsoft"
-version = "0.0.2"
+version = project.findProperty("library.version") as String
 
 kotlin {
     jvm {
