@@ -866,4 +866,31 @@ class TryTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `fold must return success transformer result if try was initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Try.seed(initialValue)
+                .fold(
+                    { it.length },
+                    { 0 }
+                )
+
+        assertEquals(initialValue.length, result)
+    }
+
+    @Test
+    fun `fold must return failure transformer result if try was initiated as failure`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val failureValue = 0
+        val result =
+            Try.seed<String>(initialValue)
+                .fold(
+                    { it.length },
+                    { failureValue }
+                )
+
+        assertEquals(failureValue, result)
+    }
 }
