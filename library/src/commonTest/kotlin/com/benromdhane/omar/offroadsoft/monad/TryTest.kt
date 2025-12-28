@@ -312,4 +312,85 @@ class TryTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `recover with failure predicate and alternative seed must return initial value if try was initiated as success and failure meet the condition`() {
+        val initialValue = Uuid.random().toString()
+        var evaluated = false
+        val alternativeValue = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Try.seed(initialValue)
+                .recover(alternativeValue) { true }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
+    }
+
+    @Test
+    fun `recover with failure predicate and alternative seed must return alternative value if try was initiated as failure and failure meet the condition`() {
+        val initialValue = Exception(Uuid.random().toString())
+        var evaluated = false
+        val alternativeSeed = Uuid.random().toString()
+        val alternativeValue = {
+            evaluated = true
+            alternativeSeed
+        }
+        val result =
+            Try.seed<String>(initialValue)
+                .recover(alternativeValue) { it is Exception }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeSeed, result)
+        }
+    }
+
+    @Test
+    fun `recover with failure predicate and alternative seed must return initial value if try was initiated as success and failure does not meet the condition`() {
+        val initialValue = Uuid.random().toString()
+        var evaluated = false
+        val alternativeValue = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Try.seed(initialValue)
+                .recover(alternativeValue) { false }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
+    }
+
+    @Test
+    fun `recover with failure predicate and alternative seed must return initial failure if try was initiated as failure and failure does not meet the condition`() {
+        val initialValue = Exception(Uuid.random().toString())
+        var evaluated = false
+        val alternativeValue = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Try.seed<String>(initialValue)
+                .recover(alternativeValue) { it is IllegalArgumentException }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
+    }
 }
