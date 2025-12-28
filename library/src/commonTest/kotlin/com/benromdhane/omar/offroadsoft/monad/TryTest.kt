@@ -955,4 +955,28 @@ class TryTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `either as try must return failure is the initial either is right with failure`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Either.Right.of<String, _>(initialValue)
+                .asTry()
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `either as try must return success is initial either is left with success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Either.Left.of<_, Exception>(initialValue)
+                .asTry()
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
 }

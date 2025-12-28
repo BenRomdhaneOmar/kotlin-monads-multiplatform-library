@@ -2,6 +2,7 @@ package com.benromdhane.omar.offroadsoft.monad.error
 
 import com.benromdhane.omar.offroadsoft.monad.Either
 import com.benromdhane.omar.offroadsoft.monad.Maybe
+import kotlin.jvm.JvmName
 import kotlin.reflect.KClass
 
 sealed interface Try<SUCCESS> {
@@ -189,7 +190,16 @@ sealed interface Try<SUCCESS> {
 }
 
 fun <SUCCESS> Try<Try<SUCCESS>>.flatten() = this.flatMapSuccess { it }
+
+@JvmName("asTryRight")
 fun <FAILURE : Throwable, SUCCESS> Either<FAILURE, SUCCESS>.asTry() =
+    this.fold(
+        { Try.seed(it) },
+        { Try.seed(it) }
+    )
+
+@JvmName("asTryLeft")
+fun <FAILURE : Throwable, SUCCESS> Either<SUCCESS, FAILURE>.asTry() =
     this.fold(
         { Try.seed(it) },
         { Try.seed(it) }
