@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad
 
 import com.benromdhane.omar.offroadsoft.monad.error.Try
+import io.kotest.assertions.assertSoftly
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -217,5 +218,46 @@ class TryTest {
                 .orNull()!!
 
         assertEquals(alternativeValue, result)
+    }
+
+    @Test
+    fun `recover with alternative seed must return initial value if try was initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        var evaluated = false
+        val alternativeValue = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Try.seed(initialValue)
+                .recover(alternativeValue)
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
+    }
+
+    @Test
+    fun `recover with alternative seed must return alternative value if try was initiated as failure`() {
+        val initialValue = Exception(Uuid.random().toString())
+        var evaluated = false
+        val alternativeSeed = Uuid.random().toString()
+        val alternativeValue = {
+            evaluated = true
+            alternativeSeed
+        }
+        val result =
+            Try.seed<String>(initialValue)
+                .recover(alternativeValue)
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeSeed, result)
+        }
     }
 }
