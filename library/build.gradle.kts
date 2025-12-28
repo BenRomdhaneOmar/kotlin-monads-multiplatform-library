@@ -16,7 +16,7 @@ repositories {
 }
 
 group = "com.benromdhane.omar.offroadsoft"
-version = "0.0.1"
+version = "0.0.2"
 
 kotlin {
     jvm {
