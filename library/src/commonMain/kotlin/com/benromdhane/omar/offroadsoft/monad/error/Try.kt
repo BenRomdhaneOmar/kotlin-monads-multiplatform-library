@@ -17,6 +17,7 @@ sealed interface Try<SUCCESS> {
     fun <FAILURE : Throwable> recover(alternative: SUCCESS, failureType: KClass<FAILURE>): Try<SUCCESS>
     fun recover(alternative: () -> SUCCESS, condition: (Throwable) -> Boolean): Try<SUCCESS>
     fun <FAILURE : Throwable> recover(alternative: () -> SUCCESS, failureType: KClass<FAILURE>): Try<SUCCESS>
+    fun filterSuccess(alternative: Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
 
     companion object Of {
 
@@ -55,6 +56,14 @@ sealed interface Try<SUCCESS> {
 
         override fun recover(alternative: () -> SUCCESS, condition: (Throwable) -> Boolean) = this
         override fun <FAILURE : Throwable> recover(alternative: () -> SUCCESS, failureType: KClass<FAILURE>) = this
+        override fun filterSuccess(
+            alternative: Throwable,
+            condition: (SUCCESS) -> Boolean
+        ) =
+            if (condition(this.success))
+                this
+            else
+                Failure.of(alternative)
 
         companion object Builder {
 
@@ -114,6 +123,8 @@ sealed interface Try<SUCCESS> {
                 alternative,
                 failureType::isInstance
             )
+
+        override fun filterSuccess(alternative: Throwable, condition: (SUCCESS) -> Boolean) = this
 
         companion object Builder {
 
