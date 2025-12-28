@@ -979,4 +979,16 @@ class TryTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `throwable as try must return failure with initial throwable`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            initialValue
+                .asTry<String>()
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
 }
