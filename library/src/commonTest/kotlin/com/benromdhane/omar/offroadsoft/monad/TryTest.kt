@@ -792,4 +792,54 @@ class TryTest {
             assertEquals(initialValue, result)
         }
     }
+
+    @Test
+    fun `flat map success must return transformed value if initial try is success and transformed try is success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Try.seed(initialValue)
+                .flatMapSuccess { Try.seed(it.length) }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue.length, result)
+    }
+
+    @Test
+    fun `flat map success must return failure if initial try is success and transformed try is failure`() {
+        val initialValue = Uuid.random().toString()
+        val failure = Exception(Uuid.random().toString())
+        val result =
+            Try.seed(initialValue)
+                .flatMapSuccess { Try.seed<Int>(failure) }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(failure, result)
+    }
+
+    @Test
+    fun `flat map success must return initial failure if initial try is failure and transformed try is success`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<String>(initialValue)
+                .flatMapSuccess { Try.seed(it.length) }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `flat map success must return initial failure if initial try is failure and transformed try is failure`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val failure = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<String>(initialValue)
+                .flatMapSuccess { Try.seed<Int>(failure) }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
 }

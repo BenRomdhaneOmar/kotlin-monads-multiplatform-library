@@ -21,6 +21,7 @@ sealed interface Try<SUCCESS> {
     fun filterSuccess(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
     fun filterSuccessNot(alternative: Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
     fun filterSuccessNot(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
+    fun <NEW_SUCCESS> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>): Try<NEW_SUCCESS>
 
     companion object Of {
 
@@ -95,6 +96,9 @@ sealed interface Try<SUCCESS> {
             else
                 Failure.of(alternative())
 
+        override fun <NEW_SUCCESS> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>) =
+            mapper(this.success)
+
         companion object Builder {
 
             fun <SUCCESS> of(
@@ -158,6 +162,8 @@ sealed interface Try<SUCCESS> {
         override fun filterSuccess(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean) = this
         override fun filterSuccessNot(alternative: Throwable, condition: (SUCCESS) -> Boolean) = this
         override fun filterSuccessNot(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean) = this
+        override fun <NEW_SUCCESS> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>) =
+            Failure<NEW_SUCCESS>(this.failure)
 
         companion object Builder {
 
