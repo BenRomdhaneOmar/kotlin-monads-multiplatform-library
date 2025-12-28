@@ -12,6 +12,7 @@ sealed interface Try<SUCCESS> {
     fun mapFailure(mapper: (Throwable) -> Throwable): Try<SUCCESS>
     fun recover(alternative: SUCCESS): Try<SUCCESS>
     fun recover(alternative: () -> SUCCESS): Try<SUCCESS>
+    fun recover(alternative: SUCCESS, condition: (Throwable) -> Boolean): Try<SUCCESS>
 
     companion object Of {
 
@@ -45,6 +46,7 @@ sealed interface Try<SUCCESS> {
         override fun mapFailure(mapper: (Throwable) -> Throwable) = this
         override fun recover(alternative: SUCCESS) = this
         override fun recover(alternative: () -> SUCCESS) = this
+        override fun recover(alternative: SUCCESS, condition: (Throwable) -> Boolean) = this
 
         companion object Builder {
 
@@ -69,6 +71,14 @@ sealed interface Try<SUCCESS> {
         override fun mapFailure(mapper: (Throwable) -> Throwable) = Failure<SUCCESS>(mapper(this.failure))
         override fun recover(alternative: SUCCESS) = recover { alternative }
         override fun recover(alternative: () -> SUCCESS) = Success.of(alternative())
+        override fun recover(
+            alternative: SUCCESS,
+            condition: (Throwable) -> Boolean
+        ) =
+            if (condition(this.failure))
+                Success.of(alternative)
+            else
+                this
 
         companion object Builder {
 
