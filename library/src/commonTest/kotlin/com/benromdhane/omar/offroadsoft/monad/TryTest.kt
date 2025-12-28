@@ -578,4 +578,56 @@ class TryTest {
 
         assertEquals(alternativeValue, result)
     }
+
+    @Test
+    fun `filter success not must return initial value if try was initiated as failure and success meet the condition`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val alternativeValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<String>(initialValue)
+                .filterSuccessNot(alternativeValue) { true }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `filter success not must return initial value if try was initiated as failure and success does not meet the condition`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val alternativeValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<String>(initialValue)
+                .filterSuccessNot(alternativeValue) { false }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `filter success not must return alternative failure if try was initiated as success and success meet the condition`() {
+        val initialValue = Uuid.random().toString()
+        val alternativeValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed(initialValue)
+                .filterSuccessNot(alternativeValue) { it.isNotEmpty() }
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(alternativeValue, result)
+    }
+
+    @Test
+    fun `filter success not must return initial value if try was initiated as success and success does not meet the condition`() {
+        val initialValue = Uuid.random().toString()
+        val alternativeValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed(initialValue)
+                .filterSuccessNot(alternativeValue) { it.isEmpty() }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
 }
