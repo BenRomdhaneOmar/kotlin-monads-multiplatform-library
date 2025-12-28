@@ -75,6 +75,6 @@ jobs:
         run: |
           git config user.name "kotlin-monads-multiplatform-library-github-actions[bot]"
           git config user.email "kotlin-monads-multiplatform-library-github-actions[bot]@users.noreply.github.com"
-          git add ./library/build.gradle.kts
+          git add gradle.properties
           git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }} [skip ci]"
           git push
