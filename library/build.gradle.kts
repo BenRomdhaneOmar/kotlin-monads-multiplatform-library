@@ -135,7 +135,7 @@ publishing {
 mavenPublishing {
     publishToMavenCentral()
 
-//    signAllPublications()
+    signAllPublications()
 
     coordinates(group.toString(), "kotlin-monads-multiplatform-library", version.toString())
 
@@ -143,10 +143,12 @@ mavenPublishing {
         name = "Off Road Soft kotlin monads multiplatform library"
         description = "A library to introduce monads to kotlin multiplatform."
         inceptionYear = "2025"
+        url = "https://github.com/BenRomdhaneOmar/kotlin-monads-multiplatform-library"
         licenses {
             license {
                 name = "GNU Affero General Public License, Version 3.0"
                 url = "https://www.gnu.org/licenses/agpl-3.0.html#license-text"
+                description = "https://www.gnu.org/licenses/agpl-3.0.html#license-text"
             }
         }
         developers {
@@ -159,7 +161,7 @@ mavenPublishing {
                 roles = listOf(
                     "Software Architect",
                     "Technical Expert",
-                    "Java/Kotlin backend developer"
+                    "Java/Kotlin developer"
                 )
                 timezone = "GMT+1/GMT+7"
             }
