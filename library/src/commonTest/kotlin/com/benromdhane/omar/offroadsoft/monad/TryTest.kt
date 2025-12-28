@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad
 
 import com.benromdhane.omar.offroadsoft.monad.error.Try
+import com.benromdhane.omar.offroadsoft.monad.error.flatten
 import io.kotest.assertions.assertSoftly
 import kotlin.random.Random
 import kotlin.test.Test
@@ -892,5 +893,41 @@ class TryTest {
                 )
 
         assertEquals(failureValue, result)
+    }
+
+    @Test
+    fun `flatten must return failure is the outer try is a failure`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<Try<String>>(initialValue)
+                .flatten()
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `flatten must return failure is the inner try is a failure`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed(Try.seed<String>(initialValue))
+                .flatten()
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `flatten must return success is the inner try is a success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Try.seed(Try.seed(initialValue))
+                .flatten()
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
     }
 }
