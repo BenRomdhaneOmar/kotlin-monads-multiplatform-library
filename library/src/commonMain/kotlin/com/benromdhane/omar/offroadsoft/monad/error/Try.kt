@@ -13,6 +13,7 @@ sealed interface Try<SUCCESS> {
     fun recover(alternative: SUCCESS): Try<SUCCESS>
     fun recover(alternative: () -> SUCCESS): Try<SUCCESS>
     fun recover(alternative: SUCCESS, condition: (Throwable) -> Boolean): Try<SUCCESS>
+    fun recover(alternative: () -> SUCCESS, condition: (Throwable) -> Boolean): Try<SUCCESS>
 
     companion object Of {
 
@@ -47,6 +48,7 @@ sealed interface Try<SUCCESS> {
         override fun recover(alternative: SUCCESS) = this
         override fun recover(alternative: () -> SUCCESS) = this
         override fun recover(alternative: SUCCESS, condition: (Throwable) -> Boolean) = this
+        override fun recover(alternative: () -> SUCCESS, condition: (Throwable) -> Boolean) = this
 
         companion object Builder {
 
@@ -75,8 +77,17 @@ sealed interface Try<SUCCESS> {
             alternative: SUCCESS,
             condition: (Throwable) -> Boolean
         ) =
+            recover(
+                { alternative },
+                condition
+            )
+
+        override fun recover(
+            alternative: () -> SUCCESS,
+            condition: (Throwable) -> Boolean
+        ) =
             if (condition(this.failure))
-                Success.of(alternative)
+                Success.of(alternative())
             else
                 this
 
