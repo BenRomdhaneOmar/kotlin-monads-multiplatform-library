@@ -187,3 +187,5 @@ sealed interface Try<SUCCESS> {
         }
     }
 }
+
+fun <SUCCESS> Try<Try<SUCCESS>>.flatten() = this.flatMapSuccess { it }
