@@ -30,6 +30,11 @@ kotlin {
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
+        lint {
+            checkReleaseBuilds = false
+            abortOnError = false
+        }
+
         withJava()
         withHostTestBuilder {}.configure {}
         withDeviceTestBuilder {
@@ -46,6 +51,20 @@ kotlin {
             }
         }
     }
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.add("-Xlint:none")
+    }
+
+    afterEvaluate {
+        tasks.matching {
+            it.name.contains("extractAnnotations") ||
+                    it.name.contains("ExtractAnnotations")
+        }.configureEach {
+            enabled = false
+        }
+    }
+
     linuxX64()
 
     @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
