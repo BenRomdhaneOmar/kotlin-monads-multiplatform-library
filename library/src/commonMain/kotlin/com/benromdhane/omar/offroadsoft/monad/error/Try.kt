@@ -1,5 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
+import com.benromdhane.omar.offroadsoft.monad.Either
 import com.benromdhane.omar.offroadsoft.monad.Maybe
 import kotlin.reflect.KClass
 
@@ -22,6 +23,7 @@ sealed interface Try<SUCCESS> {
     fun filterSuccessNot(alternative: Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
     fun filterSuccessNot(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
     fun <NEW_SUCCESS> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>): Try<NEW_SUCCESS>
+    fun toEither(): Either<Throwable, SUCCESS>
 
     companion object Of {
 
@@ -99,6 +101,8 @@ sealed interface Try<SUCCESS> {
         override fun <NEW_SUCCESS> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>) =
             mapper(this.success)
 
+        override fun toEither() = Either.Right.of<Throwable, SUCCESS>(this.success)
+
         companion object Builder {
 
             fun <SUCCESS> of(
@@ -164,6 +168,8 @@ sealed interface Try<SUCCESS> {
         override fun filterSuccessNot(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean) = this
         override fun <NEW_SUCCESS> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>) =
             Failure<NEW_SUCCESS>(this.failure)
+
+        override fun toEither() = Either.Left.of<Throwable, SUCCESS>(this.failure)
 
         companion object Builder {
 
