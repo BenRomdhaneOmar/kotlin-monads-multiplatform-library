@@ -189,3 +189,8 @@ sealed interface Try<SUCCESS> {
 }
 
 fun <SUCCESS> Try<Try<SUCCESS>>.flatten() = this.flatMapSuccess { it }
+fun <FAILURE : Throwable, SUCCESS> Either<FAILURE, SUCCESS>.asTry() =
+    this.fold(
+        { Try.seed(it) },
+        { Try.seed(it) }
+    )
