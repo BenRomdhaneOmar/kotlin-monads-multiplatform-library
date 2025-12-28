@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad
 
 import com.benromdhane.omar.offroadsoft.monad.error.Try
+import com.benromdhane.omar.offroadsoft.monad.error.asTry
 import com.benromdhane.omar.offroadsoft.monad.error.flatten
 import io.kotest.assertions.assertSoftly
 import kotlin.random.Random
@@ -925,6 +926,30 @@ class TryTest {
         val result =
             Try.seed(Try.seed(initialValue))
                 .flatten()
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `either as try must return failure is the initial either is left with failure`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Either.Left.of<_, String>(initialValue)
+                .asTry()
+                .toMaybeFailure()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `either as try must return success is initial either is right with success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Either.Right.of<Exception, _>(initialValue)
+                .asTry()
                 .toMaybeSuccess()
                 .orNull()!!
 
