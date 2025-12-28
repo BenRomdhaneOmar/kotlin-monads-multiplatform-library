@@ -56,17 +56,20 @@ jobs:
       - name: Increment version
         id: version
         run: |
-          CURRENT_VERSION=$(grep "^version= " ./library/build.gradle.kts | cut -d'= ' -f2)
+          CURRENT_VERSION=$(grep "^version" ./library/build.gradle.kts | cut -d'"' -f2)
           echo "Current version: $CURRENT_VERSION"
-          IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
-          MAJOR=${VERSION_PARTS[0]}
-          MINOR=${VERSION_PARTS[1]}
-          PATCH=${VERSION_PARTS[2]}
+          MAJOR=$(echo "$CURRENT_VERSION" | cut -d'.' -f1)
+          echo "Current major: $MAJOR"
+          MINOR=$(echo "$CURRENT_VERSION" | cut -d'.' -f2)
+          echo "Current minor: $MINOR"
+          PATCH=$(echo "$CURRENT_VERSION" | cut -d'.' -f3)
+          echo "Current patch: $PATCH"
           NEW_PATCH=$((PATCH + 1))
+          echo "New patch: $PATCH"
           NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
           echo "New version: $NEW_VERSION"
-          sed -i "s/^version= .*/version= $NEW_VERSION/" ./library/build.gradle.kts
-          echo "new_version= $NEW_VERSION" >> $GITHUB_OUTPUT
+          sed -i "s/^version =.*/version = \"$NEW_VERSION\"/" ./library/build.gradle.kts
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
       - name: Commit version bump
         run: |
           git config user.name "kotlin-monads-multiplatform-library-github-actions[bot]"
