@@ -1,9 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad
 
-import com.benromdhane.omar.offroadsoft.monad.error.Try
-import com.benromdhane.omar.offroadsoft.monad.error.asTry
-import com.benromdhane.omar.offroadsoft.monad.error.flatten
-import com.benromdhane.omar.offroadsoft.monad.error.toFilteredMaybeSuccess
+import com.benromdhane.omar.offroadsoft.monad.error.*
 import io.kotest.assertions.assertSoftly
 import kotlin.random.Random
 import kotlin.test.Test
@@ -1044,6 +1041,50 @@ class TryTest {
         val result =
             Try.seed<String>(initialValue)
                 .toFilteredMaybeSuccess { false }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe failure must return maybe of initial value if try was initiated as failure and the value meet the condition`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<String>(initialValue)
+                .toFilteredMaybeFailure { it is Exception }
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `to filtered maybe failure must return empty maybe if try was initiated as failure and the value does not meet the condition`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<String>(initialValue)
+                .toFilteredMaybeFailure { it is IllegalArgumentException }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe failure must return empty maybe if try was initiated as success and condition is valid`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Try.seed(initialValue)
+                .toFilteredMaybeFailure { true }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe failure must return empty maybe if try was initiated as success and condition is non valid`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Try.seed(initialValue)
+                .toFilteredMaybeFailure { false }
                 .empty()
 
         assertTrue { result }

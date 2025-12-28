@@ -150,7 +150,8 @@ fun <LEFT, RIGHT> Either<LEFT, RIGHT>.toFilteredMaybeRight(condition: (RIGHT) ->
         .filter(condition)
 
 fun <LEFT, RIGHT> Either<LEFT, RIGHT>.toFilteredMaybeLeft(condition: (LEFT) -> Boolean): Maybe<LEFT> =
-    this.toMaybeLeft().filter(condition)
+    this.toMaybeLeft()
+        .filter(condition)
 
 fun <ELEMENT> Either<ELEMENT, ELEMENT>.toFilteredMaybe(condition: (ELEMENT) -> Boolean) =
     (
