@@ -991,4 +991,16 @@ class TryTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `any type except throwable as try must return success with initial value`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            initialValue
+                .asTry()
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
 }
