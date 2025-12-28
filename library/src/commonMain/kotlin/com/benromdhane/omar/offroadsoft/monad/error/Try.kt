@@ -20,6 +20,7 @@ sealed interface Try<SUCCESS> {
     fun filterSuccess(alternative: Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
     fun filterSuccess(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
     fun filterSuccessNot(alternative: Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
+    fun filterSuccessNot(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
 
     companion object Of {
 
@@ -80,10 +81,19 @@ sealed interface Try<SUCCESS> {
             alternative: Throwable,
             condition: (SUCCESS) -> Boolean
         ) =
+            filterSuccessNot(
+                { alternative },
+                condition
+            )
+
+        override fun filterSuccessNot(
+            alternative: () -> Throwable,
+            condition: (SUCCESS) -> Boolean
+        ) =
             if (condition(this.success).not())
                 this
             else
-                Failure.of(alternative)
+                Failure.of(alternative())
 
         companion object Builder {
 
@@ -146,8 +156,8 @@ sealed interface Try<SUCCESS> {
 
         override fun filterSuccess(alternative: Throwable, condition: (SUCCESS) -> Boolean) = this
         override fun filterSuccess(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean) = this
-
         override fun filterSuccessNot(alternative: Throwable, condition: (SUCCESS) -> Boolean) = this
+        override fun filterSuccessNot(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean) = this
 
         companion object Builder {
 
