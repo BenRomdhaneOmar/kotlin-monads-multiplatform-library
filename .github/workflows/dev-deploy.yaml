@@ -1,0 +1,80 @@
+name: Deploy developing version
+run-name: Deploy developing version of ${{ github.repository }} triggered by a ${{ github.event_name }} event.
+on:
+  push:
+    branches: [ dev ]
+jobs:
+  Deploy-Dev-Actions:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: List files in the repository
+        run: |
+          ls -lR ${{ github.workspace }}
+      - name: Set up Java 25
+        run: echo "JAVA_HOME=$JAVA_HOME_25_X64" >> $GITHUB_ENV
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+      - name: Set up gradle
+        run: ./gradlew -version
+      - name: Wasm Js Browser Test
+        run: ./gradlew clean wasmJsBrowserTest
+      - name: Wasm Js Test
+        run: ./gradlew clean wasmJsTest
+      - name: Linux X64 Test
+        run: ./gradlew clean linuxX64Test
+      - name: Jvm Test
+        run: ./gradlew clean jvmTest
+      - name: Cache SonarQube packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Generate Kover reports
+        run: ./gradlew koverXmlReport
+      - name: Run SonarCloud Analysis
+        run: |
+          ./gradlew sonar \
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} \
+            -Dsonar.organization=${{ secrets.SONAR_ORG }} \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Run Detekt Analysis
+        run: ./gradlew detekt
+      - name: Increment version
+        id: version
+        run: |
+          CURRENT_VERSION=$(grep "^version= " ./library/build.gradle.kts | cut -d'= ' -f2)
+          echo "Current version: $CURRENT_VERSION"
+          IFS='.' read -ra VERSION_PARTS <<< "$CURRENT_VERSION"
+          MAJOR=${VERSION_PARTS[0]}
+          MINOR=${VERSION_PARTS[1]}
+          PATCH=${VERSION_PARTS[2]}
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+          echo "New version: $NEW_VERSION"
+          sed -i "s/^version= .*/version= $NEW_VERSION/" ./library/build.gradle.kts
+          echo "new_version= $NEW_VERSION" >> $GITHUB_OUTPUT
+      - name: Commit version bump
+        run: |
+          git config user.name "kotlin-monads-multiplatform-library-github-actions[bot]"
+          git config user.email "kotlin-monads-multiplatform-library-github-actions[bot]@users.noreply.github.com"
+          git add ./library/build.gradle.kts
+          git commit -m "chore: bump version to ${{ steps.version.outputs.new_version }}"
+          git push
+      - name: Create Git tag
+        run: |
+          git tag "v${{ steps.version.outputs.new_version }}"
+          git push origin "v${{ steps.version.outputs.new_version }}"
