@@ -24,6 +24,7 @@ sealed interface Try<SUCCESS> {
     fun filterSuccessNot(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
     fun <NEW_SUCCESS> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>): Try<NEW_SUCCESS>
     fun toEither(): Either<Throwable, SUCCESS>
+    fun <RESULT> fold(successMapper: (SUCCESS) -> RESULT, failureMapper: (Throwable) -> RESULT): RESULT
 
     companion object Of {
 
@@ -102,6 +103,8 @@ sealed interface Try<SUCCESS> {
             mapper(this.success)
 
         override fun toEither() = Either.Right.of<Throwable, SUCCESS>(this.success)
+        override fun <RESULT> fold(successMapper: (SUCCESS) -> RESULT, failureMapper: (Throwable) -> RESULT) =
+            successMapper(this.success)
 
         companion object Builder {
 
@@ -170,6 +173,8 @@ sealed interface Try<SUCCESS> {
             Failure<NEW_SUCCESS>(this.failure)
 
         override fun toEither() = Either.Left.of<Throwable, SUCCESS>(this.failure)
+        override fun <RESULT> fold(successMapper: (SUCCESS) -> RESULT, failureMapper: (Throwable) -> RESULT) =
+            failureMapper(this.failure)
 
         companion object Builder {
 
