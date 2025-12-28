@@ -3,6 +3,7 @@ package com.benromdhane.omar.offroadsoft.monad
 import com.benromdhane.omar.offroadsoft.monad.error.Try
 import com.benromdhane.omar.offroadsoft.monad.error.asTry
 import com.benromdhane.omar.offroadsoft.monad.error.flatten
+import com.benromdhane.omar.offroadsoft.monad.error.toFilteredMaybeSuccess
 import io.kotest.assertions.assertSoftly
 import kotlin.random.Random
 import kotlin.test.Test
@@ -1002,5 +1003,49 @@ class TryTest {
                 .orNull()!!
 
         assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `to filtered maybe success must return maybe of initial value if try was initiated as success and the value meet the condition`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Try.seed(initialValue)
+                .toFilteredMaybeSuccess { it.isNotEmpty() }
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `to filtered maybe success must return empty maybe if try was initiated as success and the value does not meet the condition`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Try.seed(initialValue)
+                .toFilteredMaybeSuccess { it.isEmpty() }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe success must return empty maybe if try was initiated as failure and condition is valid`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<String>(initialValue)
+                .toFilteredMaybeSuccess { true }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe success must return empty maybe if try was initiated as failure and condition is non valid`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<String>(initialValue)
+                .toFilteredMaybeSuccess { false }
+                .empty()
+
+        assertTrue { result }
     }
 }
