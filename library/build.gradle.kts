@@ -57,6 +57,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+        }
+
+        androidMain.dependencies {
             implementation(libs.android.tools.lint)
         }
 
