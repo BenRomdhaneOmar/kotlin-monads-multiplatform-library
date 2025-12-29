@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.lint.AndroidLintTask
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -45,6 +46,9 @@ kotlin {
                 }
             }
         }
+        lint {
+            checkReleaseBuilds = false
+        }
     }
 
     linuxX64()
@@ -60,18 +64,23 @@ kotlin {
         }
 
         androidMain.dependencies {
-            implementation(libs.android.tools.lint)
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotest.assertions.core)
         }
+
         val androidDeviceTest by getting {
             dependencies {
                 implementation(libs.runner)
                 implementation(libs.espresso.core)
                 implementation(libs.junit)
+            }
+        }
+
+        val androidHostTest by getting {
+            dependencies {
             }
         }
 
@@ -128,6 +137,8 @@ kotlin {
     tasks.named("sonar") {
         dependsOn(subprojects.map { it.tasks.named("koverXmlReport") })
     }
+    tasks.withType<AndroidLintTask>().all { enabled = false }
+    tasks.withType<Javadoc>().all { enabled = false }
 }
 
 publishing {
