@@ -1,4 +1,3 @@
-
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -133,6 +132,22 @@ kotlin {
     }
     tasks.named("sonar") {
         dependsOn(subprojects.map { it.tasks.named("koverXmlReport") })
+    }
+}
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        mavenLocal()
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        mavenLocal()
     }
 }
 
