@@ -1,4 +1,4 @@
-import com.android.build.gradle.internal.lint.AndroidLintTask
+
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -30,7 +30,11 @@ kotlin {
         namespace = "com.benromdhane.omar.offroadsoft.monads"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
-
+        lint {
+            checkReleaseBuilds = false
+            abortOnError = false
+            disable += setOf("LintBaseline", "LintError")
+        }
         withJava()
         withHostTestBuilder {}.configure {}
         withDeviceTestBuilder {
@@ -46,11 +50,19 @@ kotlin {
                 }
             }
         }
-        lint {
-            checkReleaseBuilds = false
-        }
+    }
+    tasks.withType<JavaCompile>().configureEach {
+        options.compilerArgs.add("-Xlint:none")
     }
 
+    afterEvaluate {
+        tasks.matching {
+            it.name.contains("extractAnnotations", ignoreCase = true) ||
+                    it.name.contains("ExtractAnnotations", ignoreCase = true)
+        }.configureEach {
+            enabled = false
+        }
+    }
     linuxX64()
 
     @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
@@ -137,8 +149,6 @@ kotlin {
     tasks.named("sonar") {
         dependsOn(subprojects.map { it.tasks.named("koverXmlReport") })
     }
-    tasks.withType<AndroidLintTask>().all { enabled = false }
-    tasks.withType<Javadoc>().all { enabled = false }
 }
 
 publishing {
