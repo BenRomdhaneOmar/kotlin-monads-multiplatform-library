@@ -30,11 +30,7 @@ kotlin {
         namespace = "com.benromdhane.omar.offroadsoft.monads"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
-        lint {
-            checkReleaseBuilds = false
-            abortOnError = false
-            disable += setOf("LintBaseline", "LintError")
-        }
+
         withJava()
         withHostTestBuilder {}.configure {}
         withDeviceTestBuilder {
@@ -51,18 +47,7 @@ kotlin {
             }
         }
     }
-    tasks.withType<JavaCompile>().configureEach {
-        options.compilerArgs.add("-Xlint:none")
-    }
 
-    afterEvaluate {
-        tasks.matching {
-            it.name.contains("extractAnnotations", ignoreCase = true) ||
-                    it.name.contains("ExtractAnnotations", ignoreCase = true)
-        }.configureEach {
-            enabled = false
-        }
-    }
     linuxX64()
 
     @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
