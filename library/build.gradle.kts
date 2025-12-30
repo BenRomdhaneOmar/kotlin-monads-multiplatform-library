@@ -9,7 +9,6 @@ plugins {
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.kover)
     alias(libs.plugins.detekt)
-    signing
 }
 
 repositories {
@@ -150,11 +149,6 @@ allprojects {
         mavenCentral()
         mavenLocal()
     }
-}
-
-signing {
-    useGpgCmd()
-    sign(publishing.publications)
 }
 
 publishing {
