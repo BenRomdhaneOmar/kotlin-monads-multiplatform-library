@@ -17,6 +17,7 @@ repositories {
 
 group = "com.benromdhane.omar.offroadsoft"
 version = project.findProperty("library.version") as String
+val groupId = "io.github.benromdhaneomar"
 
 kotlin {
     jvm {
@@ -26,7 +27,7 @@ kotlin {
     }
     jvmToolchain(25)
     androidLibrary {
-        namespace = "com.benromdhane.omar.offroadsoft.monads"
+        namespace = groupId
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
@@ -162,7 +163,7 @@ mavenPublishing {
 
     signAllPublications()
 
-    coordinates(group.toString(), "kotlin-monads-multiplatform-library", version.toString())
+    coordinates(groupId, "kotlin-monads-multiplatform-library", version.toString())
 
     pom {
         name = "Off Road Soft kotlin monads multiplatform library"
