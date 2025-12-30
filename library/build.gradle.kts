@@ -192,5 +192,8 @@ mavenPublishing {
                 timezone = "GMT+1/GMT+7"
             }
         }
+        scm {
+            url = "scm:git:https://github.com/BenRomdhaneOmar/kotlin-monads-multiplatform-library.git"
+        }
     }
 }
