@@ -1,5 +1,6 @@
-package com.benromdhane.omar.offroadsoft.monad
+package com.benromdhane.omar.offroadsoft.monad.error
 
+import com.benromdhane.omar.offroadsoft.monad.Either
 import com.benromdhane.omar.offroadsoft.monad.error.*
 import io.kotest.assertions.assertSoftly
 import kotlin.random.Random
