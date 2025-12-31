@@ -33,6 +33,12 @@
 
 [Either test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/EitherTest.kt)
 
+## Errors:
+
+### Try:
+
+[Try test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/error/TryTest.kt)
+
 ## Run tests for all targets:
 
 ```shell
