@@ -13,6 +13,25 @@
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=BenRomdhaneOmar_kotlin-monads-multiplatform-library&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=BenRomdhaneOmar_kotlin-monads-multiplatform-library)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=BenRomdhaneOmar_kotlin-monads-multiplatform-library&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=BenRomdhaneOmar_kotlin-monads-multiplatform-library)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=BenRomdhaneOmar_kotlin-monads-multiplatform-library&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=BenRomdhaneOmar_kotlin-monads-multiplatform-library)
+[![Hits-of-Code](https://hitsofcode.com/github/BenRomdhaneOmar/kotlin-monads-multiplatform-library)](https://hitsofcode.com/github/BenRomdhaneOmar/kotlin-monads-multiplatform-library/view)
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.benromdhaneomar/kotlin-monads-multiplatform-library-jvm?label=kotlin-monads-multiplatform-library-jvm&color=green)
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.benromdhaneomar/kotlin-monads-multiplatform-library?label=kotlin-monads-multiplatform-library&color=green)
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.benromdhaneomar/kotlin-monads-multiplatform-library-linuxx64?label=kotlin-monads-multiplatform-library-linuxx64&color=green)
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.benromdhaneomar/kotlin-monads-multiplatform-library-android?label=kotlin-monads-multiplatform-library-android&color=green)
+![Maven Central Version](https://img.shields.io/maven-central/v/io.github.benromdhaneomar/kotlin-monads-multiplatform-library-wasm-js?label=kotlin-monads-multiplatform-library-wasm-js&color=green)
+![GitHub repo size](https://img.shields.io/github/repo-size/BenRomdhaneOmar/kotlin-monads-multiplatform-library)
+![GitHub License](https://img.shields.io/github/license/BenRomdhaneOmar/kotlin-monads-multiplatform-library?color=green)
+![GitHub Repo stars](https://img.shields.io/github/stars/BenRomdhaneOmar/kotlin-monads-multiplatform-library)
+
+# how to use:
+
+## Maybe:
+
+[Maybe test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/MaybeTest.kt)
+
+## Either:
+
+[Either test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/EitherTest.kt)
 
 ## Run tests for all targets:
 
