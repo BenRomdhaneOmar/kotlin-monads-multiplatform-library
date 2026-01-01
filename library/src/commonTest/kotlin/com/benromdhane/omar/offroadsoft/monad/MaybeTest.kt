@@ -124,7 +124,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `map must be ignored if maybe was initiated as empty`() {
+    fun `map must be ignored if maybe was initiated as empty and map return non null value`() {
         val result =
             Maybe
                 .Empty
@@ -136,7 +136,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `map must transform the initial element if maybe was initiated as non empty`() {
+    fun `map must transform the initial element if maybe was initiated as non empty and map return non null value`() {
         val initialElement = Uuid.random().toString()
         val result =
             Maybe
@@ -149,7 +149,7 @@ class MaybeTest {
     }
 
     @Test
-    fun `map must transform the previous statue if maybe was initiated as non empty`() {
+    fun `map must transform the previous statue if maybe was initiated as non empty and map return non null value`() {
         val initialElement = Uuid.random().toString()
         val result =
             Maybe
@@ -160,6 +160,31 @@ class MaybeTest {
                 .orNull()!!
 
         assertEquals(initialElement.length.times(10), result)
+    }
+
+    @Test
+    fun `map must be ignored if maybe was initiated as empty and map return null value`() {
+        val result =
+            Maybe
+                .Empty
+                .of<String>()
+                .map { null }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `map must return empty maybe if maybe was initiated as non empty and map return null value`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .map { null }
+                .empty()
+
+        assertTrue { result }
     }
 
     @Test
