@@ -59,3 +59,4 @@ sealed interface PossibleError<ERROR : Any> {
 }
 
 fun Try<Unit>.asPossibleError() = PossibleError.of(this)
+fun <ERROR : Any> Either<ERROR, Unit>.asPossibleError() = PossibleError.of(this)

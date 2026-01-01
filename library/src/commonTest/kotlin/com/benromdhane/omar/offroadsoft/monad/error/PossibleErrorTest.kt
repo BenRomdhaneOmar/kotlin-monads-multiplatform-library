@@ -87,4 +87,25 @@ class PossibleErrorTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `either as possible error must return success if try was initiated as right either error on left or unit on right`() {
+        val result =
+            Either.Right.of<Throwable, _>(Unit)
+                .asPossibleError()
+                .error()
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `either as possible error must return error if try was initiated as left either error on left or unit on right`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            Either.Left.of<_, Unit>(initialError)
+                .asPossibleError()
+                .error()
+
+        assertTrue { result }
+    }
 }
