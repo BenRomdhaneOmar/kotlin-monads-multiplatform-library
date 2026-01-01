@@ -71,3 +71,5 @@ fun <ERROR : Any> Either<ERROR, Unit>.asPossibleError() = PossibleError.of(this)
 
 @JvmName("eitherRightErrorAsPossibleError")
 fun <ERROR : Any> Either<Unit, ERROR>.asPossibleError() = PossibleError.of(this)
+
+fun <ERROR : Any> Maybe<ERROR>.asPossibleError() = PossibleError.of(this)

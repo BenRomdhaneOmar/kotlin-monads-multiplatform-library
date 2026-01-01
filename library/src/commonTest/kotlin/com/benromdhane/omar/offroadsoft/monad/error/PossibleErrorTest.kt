@@ -149,4 +149,25 @@ class PossibleErrorTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `maybe as possible error must return success if try was initiated as empty`() {
+        val result =
+            Maybe.Empty.of<Throwable>()
+                .asPossibleError()
+                .error()
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `maybe as possible error must return error if try was initiated as non empty`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            Maybe.NotEmpty.of(initialError)
+                .asPossibleError()
+                .error()
+
+        assertTrue { result }
+    }
 }
