@@ -7,6 +7,7 @@ import kotlin.jvm.JvmName
 sealed interface PossibleError<ERROR : Any> {
 
     fun error(): Boolean
+    fun toMaybeError(): Maybe<ERROR>
 
     companion object Builder {
 
@@ -39,6 +40,7 @@ sealed interface PossibleError<ERROR : Any> {
     ) : PossibleError<ERROR> {
 
         override fun error() = true
+        override fun toMaybeError() = Maybe.NotEmpty.of(this.error)
 
         companion object Builder {
 
@@ -49,6 +51,8 @@ sealed interface PossibleError<ERROR : Any> {
     private class Success<ERROR : Any> private constructor() : PossibleError<ERROR> {
 
         override fun error() = false
+        override fun toMaybeError() = Maybe.Empty.of<ERROR>()
+
         override fun toString() = "Success()"
         override fun equals(other: Any?) =
             if (this === other) true

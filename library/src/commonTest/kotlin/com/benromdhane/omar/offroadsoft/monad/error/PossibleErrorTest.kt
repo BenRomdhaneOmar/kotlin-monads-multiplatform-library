@@ -3,6 +3,7 @@ package com.benromdhane.omar.offroadsoft.monad.error
 import com.benromdhane.omar.offroadsoft.monad.Either
 import com.benromdhane.omar.offroadsoft.monad.Maybe
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.uuid.ExperimentalUuidApi
@@ -169,5 +170,26 @@ class PossibleErrorTest {
                 .error()
 
         assertTrue { result }
+    }
+
+    @Test
+    fun `to maybe error must return empty maybe if possible error is created as success`() {
+        val result =
+            PossibleError.of(Try.seed(Unit))
+                .toMaybeError()
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to maybe error must return not empty maybe with initial value if possible error is created as failure`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            PossibleError.of(Try.seed(initialError))
+                .toMaybeError()
+                .orNull()!!
+
+        assertEquals(initialError, result)
     }
 }
