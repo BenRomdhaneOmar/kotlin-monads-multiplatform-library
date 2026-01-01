@@ -56,7 +56,7 @@ sealed interface PossibleError<ERROR : Any> {
         override fun toMaybeError() = Maybe.Empty.of<ERROR>()
         override fun <NEW_ERROR : Any> map(mapper: (ERROR) -> NEW_ERROR) = Success<NEW_ERROR>()
 
-        override fun toString() = "Success()"
+        override fun toString() = "Success"
         override fun equals(other: Any?) =
             if (this === other) true
             else if (other == null || this::class != other::class) false

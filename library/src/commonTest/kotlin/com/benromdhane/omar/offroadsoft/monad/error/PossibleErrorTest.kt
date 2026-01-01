@@ -232,4 +232,65 @@ class PossibleErrorTest {
             assertEquals(mappedError, result)
         }
     }
+
+    @Test
+    fun `to string must return success if possible error is created as success`() {
+        val result =
+            PossibleError.of(Try.seed(Unit))
+                .toString()
+
+        assertEquals("Success", result)
+    }
+
+    @Test
+    fun `equals must return true if two possible errors are success`() {
+        val result =
+            PossibleError.of(Try.seed(Unit))
+                .equals(PossibleError.of(Try.seed(Unit)))
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `equals must return true if possible errors compared to itself`() {
+        val possibleError = PossibleError.of(Try.seed(Unit))
+        val result =
+            possibleError
+                .equals(possibleError)
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `equals must return false if two possible errors are not both success`() {
+        val result =
+            PossibleError.of(Try.seed(Unit))
+                .equals(
+                    PossibleError.of(
+                        Try.seed(
+                            Exception(Uuid.random().toString())
+                        )
+                    )
+                )
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `equals must return false if possible errors is compared to another object`() {
+        val result =
+            PossibleError.of(Try.seed(Unit))
+                .equals(Uuid.random().toString())
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `equals must return false if possible errors is compared to null`() {
+        val result =
+            PossibleError.of(Try.seed(Unit))
+                .equals(null)
+
+        assertFalse { result }
+    }
 }
