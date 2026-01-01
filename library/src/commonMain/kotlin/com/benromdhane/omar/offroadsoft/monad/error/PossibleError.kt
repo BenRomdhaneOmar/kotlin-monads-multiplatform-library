@@ -1,5 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
+import com.benromdhane.omar.offroadsoft.monad.Either
+
 sealed interface PossibleError<ERROR : Any> {
 
     fun error(): Boolean
@@ -9,6 +11,11 @@ sealed interface PossibleError<ERROR : Any> {
         fun of(`try`: Try<Unit>) =
             `try`.toMaybeFailure()
                 .map { Error.of<Throwable>(it) }
+                .or(Success.of())
+
+        fun <ERROR : Any> of(either: Either<ERROR, Unit>) =
+            either.toMaybeLeft()
+                .map { Error.of<ERROR>(it) }
                 .or(Success.of())
     }
 

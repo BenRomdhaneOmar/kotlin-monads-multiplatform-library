@@ -1,5 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
+import com.benromdhane.omar.offroadsoft.monad.Either
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -44,6 +45,25 @@ class PossibleErrorTest {
         val result =
             Try.seed<Unit>(initialError)
                 .asPossibleError()
+                .error()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `error must return false if possible error is created by either error on left or unit on right that was initiated as right`() {
+        val result =
+            PossibleError.of(Either.Right.of<Throwable, _>(Unit))
+                .error()
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `error must return true if possible error is created by either error on left or unit on right that was initiated as left`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            PossibleError.of(Either.Left.of<_, Unit>(initialError))
                 .error()
 
         assertTrue { result }
