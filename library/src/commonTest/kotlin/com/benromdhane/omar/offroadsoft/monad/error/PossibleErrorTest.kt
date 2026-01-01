@@ -2,6 +2,7 @@ package com.benromdhane.omar.offroadsoft.monad.error
 
 import com.benromdhane.omar.offroadsoft.monad.Either
 import com.benromdhane.omar.offroadsoft.monad.Maybe
+import io.kotest.assertions.assertSoftly
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -191,5 +192,44 @@ class PossibleErrorTest {
                 .orNull()!!
 
         assertEquals(initialError, result)
+    }
+
+    @Test
+    fun `map must be ignored if possible error is created as success`() {
+        var evaluated = false
+        val mapper: (Throwable) -> Throwable = {
+            evaluated = true
+            Exception(Uuid.random().toString())
+        }
+        val result =
+            PossibleError.of(Try.seed(Unit))
+                .map(mapper)
+                .error()
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertFalse { result }
+        }
+    }
+
+    @Test
+    fun `map must transform initial error if possible error is created as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val mappedError = Exception(Uuid.random().toString())
+        val mapper: (Throwable) -> Throwable = {
+            evaluated = true
+            mappedError
+        }
+        val result =
+            PossibleError.of(Try.seed(initialError))
+                .map(mapper)
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(mappedError, result)
+        }
     }
 }

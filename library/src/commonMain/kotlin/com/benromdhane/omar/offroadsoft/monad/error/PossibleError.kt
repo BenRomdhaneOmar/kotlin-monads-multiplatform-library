@@ -8,6 +8,7 @@ sealed interface PossibleError<ERROR : Any> {
 
     fun error(): Boolean
     fun toMaybeError(): Maybe<ERROR>
+    fun <NEW_ERROR : Any> map(mapper: (ERROR) -> NEW_ERROR): PossibleError<NEW_ERROR>
 
     companion object Builder {
 
@@ -41,6 +42,7 @@ sealed interface PossibleError<ERROR : Any> {
 
         override fun error() = true
         override fun toMaybeError() = Maybe.NotEmpty.of(this.error)
+        override fun <NEW_ERROR : Any> map(mapper: (ERROR) -> NEW_ERROR) = Error(mapper(this.error))
 
         companion object Builder {
 
@@ -52,6 +54,7 @@ sealed interface PossibleError<ERROR : Any> {
 
         override fun error() = false
         override fun toMaybeError() = Maybe.Empty.of<ERROR>()
+        override fun <NEW_ERROR : Any> map(mapper: (ERROR) -> NEW_ERROR) = Success<NEW_ERROR>()
 
         override fun toString() = "Success()"
         override fun equals(other: Any?) =
