@@ -163,3 +163,5 @@ fun <ELEMENT> Either<ELEMENT, ELEMENT>.toFilteredMaybe(condition: (ELEMENT) -> B
 fun <ELEMENT> Either<ELEMENT, ELEMENT>.toMaybe() =
     if (this.right()) this.toMaybeRight()
     else this.toMaybeLeft()
+
+fun <LEFT, ELEMENT> ELEMENT.asRightEither() = Either.Right.of<LEFT, _>(this)

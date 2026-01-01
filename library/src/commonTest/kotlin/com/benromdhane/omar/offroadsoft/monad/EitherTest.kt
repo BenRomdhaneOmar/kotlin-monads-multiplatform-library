@@ -1027,4 +1027,15 @@ class EitherTest {
 
         assertEquals(initialElement, result)
     }
+
+    @Test
+    fun `as right either must return right either with initial element`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            initialElement.asRightEither<Int, _>()
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
 }
