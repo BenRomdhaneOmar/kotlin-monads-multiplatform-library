@@ -59,4 +59,9 @@ sealed interface PossibleError<ERROR : Any> {
 }
 
 fun Try<Unit>.asPossibleError() = PossibleError.of(this)
+
+@JvmName("eitherLeftErrorAsPossibleError")
 fun <ERROR : Any> Either<ERROR, Unit>.asPossibleError() = PossibleError.of(this)
+
+@JvmName("eitherRightErrorAsPossibleError")
+fun <ERROR : Any> Either<Unit, ERROR>.asPossibleError() = PossibleError.of(this)
