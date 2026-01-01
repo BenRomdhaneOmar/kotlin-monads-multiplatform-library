@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
 import com.benromdhane.omar.offroadsoft.monad.Either
+import kotlin.jvm.JvmName
 
 sealed interface PossibleError<ERROR : Any> {
 
@@ -13,8 +14,15 @@ sealed interface PossibleError<ERROR : Any> {
                 .map { Error.of<Throwable>(it) }
                 .or(Success.of())
 
+        @JvmName("ofEitherLeftError")
         fun <ERROR : Any> of(either: Either<ERROR, Unit>) =
             either.toMaybeLeft()
+                .map { Error.of<ERROR>(it) }
+                .or(Success.of())
+
+        @JvmName("ofEitherRightError")
+        fun <ERROR : Any> of(either: Either<Unit, ERROR>) =
+            either.toMaybeRight()
                 .map { Error.of<ERROR>(it) }
                 .or(Success.of())
     }

@@ -63,7 +63,26 @@ class PossibleErrorTest {
     fun `error must return true if possible error is created by either error on left or unit on right that was initiated as left`() {
         val initialError = Exception(Uuid.random().toString())
         val result =
-            PossibleError.of(Either.Left.of<_, Unit>(initialError))
+            PossibleError.of(Either.Left.of(initialError))
+                .error()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `error must return false if possible error is created by either error on right or unit on left that was initiated as left`() {
+        val result =
+            PossibleError.of(Either.Left.of<_, Throwable>(Unit))
+                .error()
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `error must return true if possible error is created by either error on right or unit on left that was initiated as right`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            PossibleError.of(Either.Right.of(initialError))
                 .error()
 
         assertTrue { result }
