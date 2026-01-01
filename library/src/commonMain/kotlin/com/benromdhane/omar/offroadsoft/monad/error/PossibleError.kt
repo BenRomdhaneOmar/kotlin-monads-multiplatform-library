@@ -42,3 +42,5 @@ sealed interface PossibleError<ERROR : Any> {
         }
     }
 }
+
+fun Try<Unit>.asPossibleError() = PossibleError.of(this)

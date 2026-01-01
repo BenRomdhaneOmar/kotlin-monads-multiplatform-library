@@ -27,4 +27,25 @@ class PossibleErrorTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `try as possible error must return success if try was initiated as success`() {
+        val result =
+            Try.trying { }
+                .asPossibleError()
+                .error()
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `try as possible error must return error if try was initiated as failure`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<Unit>(initialError)
+                .asPossibleError()
+                .error()
+
+        assertTrue { result }
+    }
 }
