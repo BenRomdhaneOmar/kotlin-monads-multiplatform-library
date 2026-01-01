@@ -1,5 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad
 
+import kotlin.jvm.JvmName
+
 sealed interface Maybe<ELEMENT> {
 
     fun present(): Boolean
@@ -66,4 +68,12 @@ sealed interface Maybe<ELEMENT> {
 }
 
 fun <ELEMENT> Maybe<Maybe<ELEMENT>>.flatten() = this.flatMap { it }
-fun <ELEMENT> ELEMENT.asMaybe() = Maybe.NotEmpty.of(this)
+
+@JvmName("nonNullableAsMaybe")
+fun <ELEMENT : Any> ELEMENT.asMaybe() = Maybe.NotEmpty.of(this)
+
+@JvmName("nullableAsMaybe")
+fun <ELEMENT : Any?> ELEMENT.asMaybe() =
+    this
+        ?.let { Maybe.NotEmpty.of<ELEMENT>(it) }
+        ?: Maybe.Empty.of()
