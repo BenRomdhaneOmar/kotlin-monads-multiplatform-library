@@ -66,3 +66,4 @@ sealed interface Maybe<ELEMENT> {
 }
 
 fun <ELEMENT> Maybe<Maybe<ELEMENT>>.flatten() = this.flatMap { it }
+fun <ELEMENT> ELEMENT.asMaybe() = Maybe.NotEmpty.of(this)

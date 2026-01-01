@@ -340,4 +340,14 @@ class MaybeTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `as maybe must return not empty maybe with the initial element for non nullable element`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            initialElement.asMaybe()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
 }
