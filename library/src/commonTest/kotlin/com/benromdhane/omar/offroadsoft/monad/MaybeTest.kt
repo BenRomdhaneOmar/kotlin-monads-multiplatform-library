@@ -340,4 +340,35 @@ class MaybeTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `as maybe must return not empty maybe with the initial element for non nullable element`() {
+        val initialElement = Uuid.random().toString()
+        val result =
+            initialElement.asMaybe()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `as maybe must return not empty maybe with the initial element for nullable non null element`() {
+        @Suppress("RedundantNullableReturnType")
+        val initialElement: String? = Uuid.random().toString()
+        val result =
+            initialElement.asMaybe()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `as maybe must return empty maybe for nullable null element`() {
+        val initialElement: String? = null
+        val result =
+            initialElement.asMaybe()
+                .empty()
+
+        assertTrue { result }
+    }
 }
