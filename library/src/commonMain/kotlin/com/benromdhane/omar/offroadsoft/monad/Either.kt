@@ -165,3 +165,4 @@ fun <ELEMENT> Either<ELEMENT, ELEMENT>.toMaybe() =
     else this.toMaybeLeft()
 
 fun <LEFT, ELEMENT> ELEMENT.asRightEither() = Either.Right.of<LEFT, _>(this)
+fun <ELEMENT, RIGHT> ELEMENT.asLeftEither() = Either.Left.of<_, RIGHT>(this)

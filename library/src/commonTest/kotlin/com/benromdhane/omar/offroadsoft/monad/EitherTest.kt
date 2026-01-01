@@ -1038,4 +1038,15 @@ class EitherTest {
 
         assertEquals(initialElement, result)
     }
+
+    @Test
+    fun `as left either must return left either with initial element`() {
+        val initialElement: String = Uuid.random().toString()
+        val result =
+            initialElement.asLeftEither<_, Int>()
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(initialElement, result)
+    }
 }
