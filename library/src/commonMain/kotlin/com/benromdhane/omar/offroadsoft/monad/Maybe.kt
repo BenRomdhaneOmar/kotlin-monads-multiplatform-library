@@ -8,6 +8,7 @@ sealed interface Maybe<ELEMENT : Any> {
     fun empty() = present().not()
     fun orNull(): ELEMENT?
     infix fun or(element: ELEMENT): ELEMENT
+    infix fun or(element: () -> ELEMENT): ELEMENT
 
     @Throws(EmptyMaybeException::class)
     fun orThrow(): ELEMENT
@@ -21,6 +22,8 @@ sealed interface Maybe<ELEMENT : Any> {
         override fun present() = false
         override fun orNull(): ELEMENT? = null
         override infix fun or(element: ELEMENT) = element
+        override fun or(element: () -> ELEMENT) = element()
+
         override fun orThrow() = throw EmptyMaybeException()
         override fun <NEW_ELEMENT : Any, NULLABLE_NEW_ELEMENT : NEW_ELEMENT?> map(mapper: (ELEMENT) -> NULLABLE_NEW_ELEMENT) =
             Empty<NEW_ELEMENT>()
@@ -44,6 +47,8 @@ sealed interface Maybe<ELEMENT : Any> {
         override fun present() = true
         override fun orNull() = this.element
         override infix fun or(element: ELEMENT) = this.element
+        override fun or(element: () -> ELEMENT) = this.element
+
         override fun orThrow() = this.element
         override fun <NEW_ELEMENT : Any, NULLABLE_NEW_ELEMENT : NEW_ELEMENT?> map(mapper: (ELEMENT) -> NULLABLE_NEW_ELEMENT) =
             mapper(this.element)

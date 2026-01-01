@@ -1,5 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad
 
+import io.kotest.assertions.assertSoftly
 import kotlin.test.*
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -99,6 +100,46 @@ class MaybeTest {
                 .or(secondElement)
 
         assertEquals(initialElement, result)
+    }
+
+    @Test
+    fun `or with element provider must return the provided element if maybe was initiated as empty`() {
+        var evaluated = false
+        val element = Uuid.random().toString()
+        val elementProvider = {
+            evaluated = true
+            element
+        }
+        val result =
+            Maybe
+                .Empty
+                .of<String>()
+                .or(elementProvider)
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(element, result)
+        }
+    }
+
+    @Test
+    fun `or with element provider must return the initial element if maybe was initiated as non empty`() {
+        val initialElement = Uuid.random().toString()
+        var evaluated = false
+        val elementProvider = {
+            evaluated = true
+            Uuid.random().toString()
+        }
+        val result =
+            Maybe
+                .NotEmpty
+                .of(initialElement)
+                .or(elementProvider)
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialElement, result)
+        }
     }
 
     @Test
