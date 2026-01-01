@@ -5,13 +5,13 @@ import com.benromdhane.omar.offroadsoft.monad.Maybe
 import kotlin.jvm.JvmName
 import kotlin.reflect.KClass
 
-sealed interface Try<SUCCESS> {
+sealed interface Try<SUCCESS : Any> {
 
     fun success(): Boolean
     fun failure() = success().not()
     fun toMaybeSuccess(): Maybe<SUCCESS>
     fun toMaybeFailure(): Maybe<Throwable>
-    fun <NEW_SUCCESS> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS): Try<NEW_SUCCESS>
+    fun <NEW_SUCCESS : Any> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS): Try<NEW_SUCCESS>
     fun mapFailure(mapper: (Throwable) -> Throwable): Try<SUCCESS>
     fun recover(alternative: SUCCESS): Try<SUCCESS>
     fun recover(alternative: () -> SUCCESS): Try<SUCCESS>
@@ -23,15 +23,15 @@ sealed interface Try<SUCCESS> {
     fun filterSuccess(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
     fun filterSuccessNot(alternative: Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
     fun filterSuccessNot(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
-    fun <NEW_SUCCESS> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>): Try<NEW_SUCCESS>
+    fun <NEW_SUCCESS : Any> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>): Try<NEW_SUCCESS>
     fun toEither(): Either<Throwable, SUCCESS>
     fun <RESULT> fold(successMapper: (SUCCESS) -> RESULT, failureMapper: (Throwable) -> RESULT): RESULT
 
     companion object Of {
 
-        fun <SUCCESS> seed(seed: SUCCESS) = Success.of(seed)
-        fun <SUCCESS> seed(seed: Throwable) = Failure.of<SUCCESS>(seed)
-        fun <SUCCESS> trying(provider: () -> SUCCESS) =
+        fun <SUCCESS : Any> seed(seed: SUCCESS) = Success.of(seed)
+        fun <SUCCESS : Any> seed(seed: Throwable) = Failure.of<SUCCESS>(seed)
+        fun <SUCCESS : Any> trying(provider: () -> SUCCESS) =
             try {
                 Success.of(provider())
             } catch (throwable: Throwable) {
@@ -40,14 +40,14 @@ sealed interface Try<SUCCESS> {
     }
 
     @ConsistentCopyVisibility
-    private data class Success<SUCCESS> private constructor(
+    private data class Success<SUCCESS : Any> private constructor(
         private val success: SUCCESS
     ) : Try<SUCCESS> {
 
         override fun success() = true
         override fun toMaybeSuccess() = Maybe.NotEmpty.of(this.success)
         override fun toMaybeFailure() = Maybe.Empty.of<Throwable>()
-        override fun <NEW_SUCCESS> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS) =
+        override fun <NEW_SUCCESS : Any> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS) =
             try {
                 Success(
                     mapper(this.success)
@@ -100,7 +100,7 @@ sealed interface Try<SUCCESS> {
             else
                 Failure.of(alternative())
 
-        override fun <NEW_SUCCESS> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>) =
+        override fun <NEW_SUCCESS : Any> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>) =
             mapper(this.success)
 
         override fun toEither() = Either.Right.of<Throwable, SUCCESS>(this.success)
@@ -109,7 +109,7 @@ sealed interface Try<SUCCESS> {
 
         companion object Builder {
 
-            fun <SUCCESS> of(
+            fun <SUCCESS : Any> of(
                 success: SUCCESS
             ): Try<SUCCESS> =
                 Success(
@@ -119,14 +119,16 @@ sealed interface Try<SUCCESS> {
     }
 
     @ConsistentCopyVisibility
-    private data class Failure<SUCCESS> private constructor(
+    private data class Failure<SUCCESS : Any> private constructor(
         private val failure: Throwable
     ) : Try<SUCCESS> {
 
         override fun success() = false
         override fun toMaybeSuccess() = Maybe.Empty.of<SUCCESS>()
         override fun toMaybeFailure() = Maybe.NotEmpty.of(this.failure)
-        override fun <NEW_SUCCESS> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS) = Failure<NEW_SUCCESS>(this.failure)
+        override fun <NEW_SUCCESS : Any> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS) =
+            Failure<NEW_SUCCESS>(this.failure)
+
         override fun mapFailure(mapper: (Throwable) -> Throwable) = Failure<SUCCESS>(mapper(this.failure))
         override fun recover(alternative: SUCCESS) = recover { alternative }
         override fun recover(alternative: () -> SUCCESS) = Success.of(alternative())
@@ -170,7 +172,7 @@ sealed interface Try<SUCCESS> {
         override fun filterSuccess(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean) = this
         override fun filterSuccessNot(alternative: Throwable, condition: (SUCCESS) -> Boolean) = this
         override fun filterSuccessNot(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean) = this
-        override fun <NEW_SUCCESS> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>) =
+        override fun <NEW_SUCCESS : Any> flatMapSuccess(mapper: (SUCCESS) -> Try<NEW_SUCCESS>) =
             Failure<NEW_SUCCESS>(this.failure)
 
         override fun toEither() = Either.Left.of<Throwable, SUCCESS>(this.failure)
@@ -179,7 +181,7 @@ sealed interface Try<SUCCESS> {
 
         companion object Builder {
 
-            fun <SUCCESS> of(
+            fun <SUCCESS : Any> of(
                 failure: Throwable
             ): Try<SUCCESS> =
                 Failure(
@@ -189,28 +191,28 @@ sealed interface Try<SUCCESS> {
     }
 }
 
-fun <SUCCESS> Try<Try<SUCCESS>>.flatten() = this.flatMapSuccess { it }
+fun <SUCCESS : Any> Try<Try<SUCCESS>>.flatten() = this.flatMapSuccess { it }
 
 @JvmName("asTryRight")
-fun <FAILURE : Throwable, SUCCESS> Either<FAILURE, SUCCESS>.asTry() =
+fun <FAILURE : Throwable, SUCCESS : Any> Either<FAILURE, SUCCESS>.asTry() =
     this.fold(
         { Try.seed(it) },
         { Try.seed(it) }
     )
 
 @JvmName("asTryLeft")
-fun <FAILURE : Throwable, SUCCESS> Either<SUCCESS, FAILURE>.asTry() =
+fun <FAILURE : Throwable, SUCCESS : Any> Either<SUCCESS, FAILURE>.asTry() =
     this.fold(
         { Try.seed(it) },
         { Try.seed(it) }
     )
 
-fun <SUCCESS> Throwable.asTry() = Try.seed<SUCCESS>(this)
-fun <SUCCESS> SUCCESS.asTry() = Try.seed(this)
-fun <SUCCESS> Try<SUCCESS>.toFilteredMaybeSuccess(condition: (SUCCESS) -> Boolean) =
+fun <SUCCESS : Any> Throwable.asTry() = Try.seed<SUCCESS>(this)
+fun <SUCCESS : Any> SUCCESS.asTry() = Try.seed(this)
+fun <SUCCESS : Any> Try<SUCCESS>.toFilteredMaybeSuccess(condition: (SUCCESS) -> Boolean) =
     this.toMaybeSuccess()
         .filter(condition)
 
-fun <SUCCESS> Try<SUCCESS>.toFilteredMaybeFailure(condition: (Throwable) -> Boolean) =
+fun <SUCCESS : Any> Try<SUCCESS>.toFilteredMaybeFailure(condition: (Throwable) -> Boolean) =
     this.toMaybeFailure()
         .filter(condition)
