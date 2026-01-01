@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
 import com.benromdhane.omar.offroadsoft.monad.Either
+import com.benromdhane.omar.offroadsoft.monad.Maybe
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -125,6 +126,25 @@ class PossibleErrorTest {
         val result =
             Either.Right.of<Unit, _>(initialError)
                 .asPossibleError()
+                .error()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `error must return false if possible error is created by maybe that was initiated as empty`() {
+        val result =
+            PossibleError.of(Maybe.Empty.of<Throwable>())
+                .error()
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `error must return true if possible error is created by maybe that was initiated as non empty`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            PossibleError.of(Maybe.NotEmpty.of(initialError))
                 .error()
 
         assertTrue { result }

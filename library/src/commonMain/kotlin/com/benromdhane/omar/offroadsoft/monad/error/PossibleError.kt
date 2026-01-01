@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
 import com.benromdhane.omar.offroadsoft.monad.Either
+import com.benromdhane.omar.offroadsoft.monad.Maybe
 import kotlin.jvm.JvmName
 
 sealed interface PossibleError<ERROR : Any> {
@@ -23,6 +24,11 @@ sealed interface PossibleError<ERROR : Any> {
         @JvmName("ofEitherRightError")
         fun <ERROR : Any> of(either: Either<Unit, ERROR>) =
             either.toMaybeRight()
+                .map { Error.of<ERROR>(it) }
+                .or(Success.of())
+
+        fun <ERROR : Any> of(maybe: Maybe<ERROR>) =
+            maybe
                 .map { Error.of<ERROR>(it) }
                 .or(Success.of())
     }
