@@ -166,14 +166,21 @@ class MaybeTest {
 
     @Test
     fun `map must be ignored if maybe was initiated as empty and map return non null value`() {
+        var evaluated = false
         val result =
             Maybe
                 .Empty
                 .of<String>()
-                .map { it.length }
+                .map {
+                    evaluated = true
+                    it.length
+                }
                 .empty()
 
-        assertTrue { result }
+        assertSoftly {
+            assertFalse { evaluated }
+            assertTrue { result }
+        }
     }
 
     @Test
@@ -205,27 +212,42 @@ class MaybeTest {
 
     @Test
     fun `map must be ignored if maybe was initiated as empty and map return null value`() {
+        var evaluated = false
         val result =
             Maybe
                 .Empty
                 .of<String>()
-                .map { null }
+                .map {
+                    evaluated = true
+                    null
+                }
                 .empty()
 
-        assertTrue { result }
+        assertSoftly {
+            assertFalse { evaluated }
+            assertTrue { result }
+        }
     }
 
     @Test
     fun `map must return empty maybe if maybe was initiated as non empty and map return null value`() {
         val initialElement = Uuid.random().toString()
+        var evaluated = false
         val result =
             Maybe
                 .NotEmpty
                 .of(initialElement)
-                .map { null }
+                .map {
+                    evaluated = true
+                    null
+                }
                 .empty()
 
-        assertTrue { result }
+        assertSoftly {
+            assertTrue { evaluated }
+            assertTrue { result }
+        }
+
     }
 
     @Test
@@ -256,26 +278,41 @@ class MaybeTest {
 
     @Test
     fun `flat map must return empty if the mapping result is non empty maybe and if maybe was initiated as empty`() {
+        var evaluated = false
         val result =
             Maybe
                 .Empty
                 .of<Int>()
-                .flatMap { Maybe.NotEmpty.of(Uuid.random().toString()) }
+                .flatMap {
+                    evaluated = true
+                    Maybe.NotEmpty.of(Uuid.random().toString())
+                }
                 .empty()
 
-        assertTrue { result }
+        assertSoftly {
+            assertFalse { evaluated }
+            assertTrue { result }
+        }
     }
 
     @Test
     fun `flat map must return empty if the mapping result is empty maybe and if maybe was initiated as empty`() {
+        var evaluated = false
         val result =
             Maybe
                 .Empty
                 .of<Int>()
-                .flatMap { Maybe.Empty.of<String>() }
+                .flatMap {
+                    evaluated = true
+                    Maybe.Empty.of<String>()
+                }
                 .empty()
 
-        assertTrue { result }
+        assertSoftly {
+            assertFalse { evaluated }
+            assertTrue { result }
+        }
+
     }
 
     @Test
@@ -333,14 +370,22 @@ class MaybeTest {
 
     @Test
     fun `filter must return empty maybe if maybe was initiated as empty`() {
+        var evaluated = false
         val result =
             Maybe
                 .Empty
                 .of<Int>()
-                .filter { true }
+                .filter {
+                    evaluated = true
+                    true
+                }
                 .empty()
 
-        assertTrue { result }
+        assertSoftly {
+            assertFalse { evaluated }
+            assertTrue { result }
+        }
+
     }
 
     @Test
@@ -371,14 +416,21 @@ class MaybeTest {
 
     @Test
     fun `filter not must return empty maybe if maybe was initiated as empty`() {
+        var evaluated = false
         val result =
             Maybe
                 .Empty
                 .of<Int>()
-                .filterNot { true }
+                .filterNot {
+                    evaluated = true
+                    true
+                }
                 .empty()
 
-        assertTrue { result }
+        assertSoftly {
+            assertFalse { evaluated }
+            assertTrue { result }
+        }
     }
 
     @Test
