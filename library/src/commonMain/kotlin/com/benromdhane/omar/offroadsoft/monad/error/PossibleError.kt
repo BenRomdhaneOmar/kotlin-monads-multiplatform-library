@@ -15,24 +15,24 @@ sealed interface PossibleError<ERROR : Any> {
         fun of(`try`: Try<Unit>) =
             `try`.toMaybeFailure()
                 .map { Error.of<Throwable>(it) }
-                .or(Success.of())
+                .or { Success.of() }
 
         @JvmName("ofEitherLeftError")
         fun <ERROR : Any> of(either: Either<ERROR, Unit>) =
             either.toMaybeLeft()
                 .map { Error.of<ERROR>(it) }
-                .or(Success.of())
+                .or { Success.of() }
 
         @JvmName("ofEitherRightError")
         fun <ERROR : Any> of(either: Either<Unit, ERROR>) =
             either.toMaybeRight()
                 .map { Error.of<ERROR>(it) }
-                .or(Success.of())
+                .or { Success.of() }
 
         fun <ERROR : Any> of(maybe: Maybe<ERROR>) =
             maybe
                 .map { Error.of<ERROR>(it) }
-                .or(Success.of())
+                .or { Success.of() }
     }
 
     @ConsistentCopyVisibility

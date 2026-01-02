@@ -39,6 +39,10 @@
 
 [Try test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/error/TryTest.kt)
 
+### Possible error:
+
+[Possible Error test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/error/PossibleErrorTest.kt)
+
 ## Run tests for all targets:
 
 ```shell
