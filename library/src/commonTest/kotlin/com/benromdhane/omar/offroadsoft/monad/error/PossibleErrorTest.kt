@@ -14,19 +14,18 @@ import kotlin.uuid.Uuid
 class PossibleErrorTest {
 
     @Test
-    fun `error must return false if possible error is created by try that was initiated as success`() {
+    fun `error must return false if possible error is created as success`() {
         val result =
-            PossibleError.of(Try.seed(Unit))
+            PossibleError.Success.of<Exception>()
                 .error()
 
         assertFalse { result }
     }
 
     @Test
-    fun `error must return true if possible error is created by try that was initiated as failure`() {
-        val initialError = Exception(Uuid.random().toString())
+    fun `error must return true if possible error is created as error`() {
         val result =
-            PossibleError.of(Try.seed(initialError))
+            PossibleError.Error.of(Exception(Uuid.random().toString()))
                 .error()
 
         assertTrue { result }
@@ -48,44 +47,6 @@ class PossibleErrorTest {
         val result =
             Try.seed<Unit>(initialError)
                 .asPossibleError()
-                .error()
-
-        assertTrue { result }
-    }
-
-    @Test
-    fun `error must return false if possible error is created by either error on left or unit on right that was initiated as right`() {
-        val result =
-            PossibleError.of(Either.Right.of<Throwable, _>(Unit))
-                .error()
-
-        assertFalse { result }
-    }
-
-    @Test
-    fun `error must return true if possible error is created by either error on left or unit on right that was initiated as left`() {
-        val initialError = Exception(Uuid.random().toString())
-        val result =
-            PossibleError.of(Either.Left.of(initialError))
-                .error()
-
-        assertTrue { result }
-    }
-
-    @Test
-    fun `error must return false if possible error is created by either error on right or unit on left that was initiated as left`() {
-        val result =
-            PossibleError.of(Either.Left.of<_, Throwable>(Unit))
-                .error()
-
-        assertFalse { result }
-    }
-
-    @Test
-    fun `error must return true if possible error is created by either error on right or unit on left that was initiated as right`() {
-        val initialError = Exception(Uuid.random().toString())
-        val result =
-            PossibleError.of(Either.Right.of(initialError))
                 .error()
 
         assertTrue { result }
@@ -134,25 +95,6 @@ class PossibleErrorTest {
     }
 
     @Test
-    fun `error must return false if possible error is created by maybe that was initiated as empty`() {
-        val result =
-            PossibleError.of(Maybe.Empty.of<Throwable>())
-                .error()
-
-        assertFalse { result }
-    }
-
-    @Test
-    fun `error must return true if possible error is created by maybe that was initiated as non empty`() {
-        val initialError = Exception(Uuid.random().toString())
-        val result =
-            PossibleError.of(Maybe.NotEmpty.of(initialError))
-                .error()
-
-        assertTrue { result }
-    }
-
-    @Test
     fun `maybe as possible error must return success if try was initiated as empty`() {
         val result =
             Maybe.Empty.of<Throwable>()
@@ -176,7 +118,7 @@ class PossibleErrorTest {
     @Test
     fun `to maybe error must return empty maybe if possible error is created as success`() {
         val result =
-            PossibleError.of(Try.seed(Unit))
+            PossibleError.Success.of<Throwable>()
                 .toMaybeError()
                 .empty()
 
@@ -184,10 +126,10 @@ class PossibleErrorTest {
     }
 
     @Test
-    fun `to maybe error must return not empty maybe with initial value if possible error is created as failure`() {
+    fun `to maybe error must return not empty maybe with initial value if possible error is created as error`() {
         val initialError = Exception(Uuid.random().toString())
         val result =
-            PossibleError.of(Try.seed(initialError))
+            PossibleError.Error.of(initialError)
                 .toMaybeError()
                 .orNull()!!
 
@@ -202,7 +144,7 @@ class PossibleErrorTest {
             Exception(Uuid.random().toString())
         }
         val result =
-            PossibleError.of(Try.seed(Unit))
+            PossibleError.Success.of<Throwable>()
                 .map(mapper)
                 .error()
 
@@ -222,7 +164,7 @@ class PossibleErrorTest {
             mappedError
         }
         val result =
-            PossibleError.of(Try.seed(initialError))
+            PossibleError.Error.of(initialError)
                 .map(mapper)
                 .toMaybeError()
                 .orNull()!!
@@ -236,7 +178,7 @@ class PossibleErrorTest {
     @Test
     fun `to string must return success if possible error is created as success`() {
         val result =
-            PossibleError.of(Try.seed(Unit))
+            PossibleError.Success.of<Throwable>()
                 .toString()
 
         assertEquals("Success", result)
@@ -245,15 +187,15 @@ class PossibleErrorTest {
     @Test
     fun `equals must return true if two possible errors are success`() {
         val result =
-            PossibleError.of(Try.seed(Unit))
-                .equals(PossibleError.of(Try.seed(Unit)))
+            PossibleError.Success.of<Throwable>()
+                .equals(PossibleError.Success.of<Throwable>())
 
         assertTrue { result }
     }
 
     @Test
     fun `equals must return true if possible errors compared to itself`() {
-        val possibleError = PossibleError.of(Try.seed(Unit))
+        val possibleError = PossibleError.Success.of<Throwable>()
         val result =
             possibleError
                 .equals(possibleError)
@@ -264,12 +206,10 @@ class PossibleErrorTest {
     @Test
     fun `equals must return false if two possible errors are not both success`() {
         val result =
-            PossibleError.of(Try.seed(Unit))
+            PossibleError.Success.of<Throwable>()
                 .equals(
-                    PossibleError.of(
-                        Try.seed(
-                            Exception(Uuid.random().toString())
-                        )
+                    PossibleError.Error.of(
+                        Exception(Uuid.random().toString())
                     )
                 )
 
@@ -279,7 +219,7 @@ class PossibleErrorTest {
     @Test
     fun `equals must return false if possible errors is compared to another object`() {
         val result =
-            PossibleError.of(Try.seed(Unit))
+            PossibleError.Success.of<Throwable>()
                 .equals(Uuid.random().toString())
 
         assertFalse { result }
@@ -288,7 +228,7 @@ class PossibleErrorTest {
     @Test
     fun `equals must return false if possible errors is compared to null`() {
         val result =
-            PossibleError.of(Try.seed(Unit))
+            PossibleError.Success.of<Throwable>()
                 .equals(null)
 
         assertFalse { result }
