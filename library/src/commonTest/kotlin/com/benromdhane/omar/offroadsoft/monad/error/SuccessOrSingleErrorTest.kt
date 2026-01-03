@@ -355,4 +355,120 @@ class SuccessOrSingleErrorTest {
             assertEquals(alternativeError, result)
         }
     }
+
+    @Test
+    fun `filter success with error provider must be ignored if initial success or single error was initiated as error and filter is not valid`() {
+        val initialError = Exception(Uuid.random().toString())
+        var conditionEvaluated = false
+        var providerEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .filterSuccess(
+                    {
+                        providerEvaluated = true
+                        Exception(Uuid.random().toString())
+                    },
+                    {
+                        conditionEvaluated = true
+                        false
+                    }
+                )
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { conditionEvaluated }
+            assertFalse { providerEvaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `filter success with error provider must be ignored if initial success or single error was initiated as error and filter is valid`() {
+        val initialError = Exception(Uuid.random().toString())
+        var conditionEvaluated = false
+        var providerEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .filterSuccess(
+                    {
+                        providerEvaluated = true
+                        Exception(Uuid.random().toString())
+                    },
+                    {
+                        conditionEvaluated = true
+                        true
+                    }
+                )
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { conditionEvaluated }
+            assertFalse { providerEvaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `filter success with error provider must return success with initial value if initial success or single error was initiated as success and filter is valid`() {
+        val initialSuccess = Uuid.random().toString()
+        var conditionEvaluated = false
+        var providerEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .filterSuccess(
+                    {
+                        providerEvaluated = true
+                        Exception(Uuid.random().toString())
+                    },
+                    {
+                        conditionEvaluated = true
+                        it.isNotEmpty()
+                    }
+                )
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { conditionEvaluated }
+            assertFalse { providerEvaluated }
+            assertEquals(initialSuccess, result)
+        }
+    }
+
+    @Test
+    fun `filter success with error provider must return error with initial alternative error if initial success or single error was initiated as success and filter is not valid`() {
+        var conditionEvaluated = false
+        var providerEvaluated = false
+        val alternativeError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .filterSuccess(
+                    {
+                        providerEvaluated = true
+                        alternativeError
+                    },
+                    {
+                        conditionEvaluated = true
+                        it.isEmpty()
+                    }
+                )
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { conditionEvaluated }
+            assertTrue { providerEvaluated }
+            assertEquals(alternativeError, result)
+        }
+    }
 }
