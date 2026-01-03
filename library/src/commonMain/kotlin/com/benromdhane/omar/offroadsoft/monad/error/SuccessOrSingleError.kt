@@ -183,3 +183,9 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         }
     }
 }
+
+fun <SUCCESS : Any> Try<SUCCESS>.asSuccessOrSingleError() =
+    this.fold(
+        { SuccessOrSingleError.Success.of<_, Throwable>(it) },
+        { SuccessOrSingleError.Error.of(it) }
+    )

@@ -1178,4 +1178,28 @@ class SuccessOrSingleErrorTest {
             assertEquals(successResult, result)
         }
     }
+
+    @Test
+    fun `try as success or single error must return success success or single error if try was initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Try.seed(initialValue)
+                .asSuccessOrSingleError()
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `try as success or single error must return error success or single error if try was initiated as failure`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Try.seed<String>(initialValue)
+                .asSuccessOrSingleError()
+                .toMaybeError()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
 }
