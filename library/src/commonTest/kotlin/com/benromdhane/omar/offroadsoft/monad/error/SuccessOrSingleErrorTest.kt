@@ -68,14 +68,39 @@ class SuccessOrSingleErrorTest {
 
     @Test
     fun `to maybe success must return maybe with initial value if success of single error was initiated as success`() {
-        val initialValue = Uuid.random().toString()
+        val initialSuccess = Uuid.random().toString()
         val result =
             SuccessOrSingleError
                 .Success
-                .of<_, Throwable>(initialValue)
+                .of<_, Throwable>(initialSuccess)
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertEquals(initialSuccess, result)
+    }
+
+    @Test
+    fun `to maybe error must return maybe with initial error if success of single error was initiated as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .toMaybeError()
+                .orNull()!!
+
+        assertEquals(initialError, result)
+    }
+
+    @Test
+    fun `to maybe error must return empty maybe if success of single error was initiated as success`() {
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .toMaybeError()
+                .empty()
+
+        assertTrue { result }
     }
 }
