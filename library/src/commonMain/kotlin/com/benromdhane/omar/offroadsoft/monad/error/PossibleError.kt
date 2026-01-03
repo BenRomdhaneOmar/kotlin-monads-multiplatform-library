@@ -2,6 +2,7 @@ package com.benromdhane.omar.offroadsoft.monad.error
 
 import com.benromdhane.omar.offroadsoft.monad.Either
 import com.benromdhane.omar.offroadsoft.monad.Maybe
+import com.benromdhane.omar.offroadsoft.monad.error.PossibleError.Success
 import kotlin.jvm.JvmName
 
 sealed interface PossibleError<ERROR : Any> {
@@ -10,33 +11,8 @@ sealed interface PossibleError<ERROR : Any> {
     fun toMaybeError(): Maybe<ERROR>
     fun <NEW_ERROR : Any> map(mapper: (ERROR) -> NEW_ERROR): PossibleError<NEW_ERROR>
 
-    companion object Builder {
-
-        fun of(`try`: Try<Unit>) =
-            `try`.toMaybeFailure()
-                .map { Error.of<Throwable>(it) }
-                .or { Success.of() }
-
-        @JvmName("ofEitherLeftError")
-        fun <ERROR : Any> of(either: Either<ERROR, Unit>) =
-            either.toMaybeLeft()
-                .map { Error.of<ERROR>(it) }
-                .or { Success.of() }
-
-        @JvmName("ofEitherRightError")
-        fun <ERROR : Any> of(either: Either<Unit, ERROR>) =
-            either.toMaybeRight()
-                .map { Error.of<ERROR>(it) }
-                .or { Success.of() }
-
-        fun <ERROR : Any> of(maybe: Maybe<ERROR>) =
-            maybe
-                .map { Error.of<ERROR>(it) }
-                .or { Success.of() }
-    }
-
     @ConsistentCopyVisibility
-    private data class Error<ERROR : Any> private constructor(
+    data class Error<ERROR : Any> private constructor(
         val error: ERROR
     ) : PossibleError<ERROR> {
 
@@ -50,7 +26,7 @@ sealed interface PossibleError<ERROR : Any> {
         }
     }
 
-    private class Success<ERROR : Any> private constructor() : PossibleError<ERROR> {
+    class Success<ERROR : Any> private constructor() : PossibleError<ERROR> {
 
         override fun error() = false
         override fun toMaybeError() = Maybe.Empty.of<ERROR>()
@@ -71,12 +47,27 @@ sealed interface PossibleError<ERROR : Any> {
     }
 }
 
-fun Try<Unit>.asPossibleError() = PossibleError.of(this)
+fun Try<Unit>.asPossibleError() =
+    this
+        .toMaybeFailure()
+        .map { PossibleError.Error.of(it) }
+        .or { Success.of() }
 
 @JvmName("eitherLeftErrorAsPossibleError")
-fun <ERROR : Any> Either<ERROR, Unit>.asPossibleError() = PossibleError.of(this)
+fun <ERROR : Any> Either<ERROR, Unit>.asPossibleError() =
+    this
+        .toMaybeLeft()
+        .map { PossibleError.Error.of(it) }
+        .or { Success.of() }
 
 @JvmName("eitherRightErrorAsPossibleError")
-fun <ERROR : Any> Either<Unit, ERROR>.asPossibleError() = PossibleError.of(this)
+fun <ERROR : Any> Either<Unit, ERROR>.asPossibleError() =
+    this
+        .toMaybeRight()
+        .map { PossibleError.Error.of(it) }
+        .or { Success.of() }
 
-fun <ERROR : Any> Maybe<ERROR>.asPossibleError() = PossibleError.of(this)
+fun <ERROR : Any> Maybe<ERROR>.asPossibleError() =
+    this
+        .map { PossibleError.Error.of(it) }
+        .or { Success.of() }
