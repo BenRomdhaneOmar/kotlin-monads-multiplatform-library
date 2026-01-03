@@ -1,5 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
+import com.benromdhane.omar.offroadsoft.monad.Either
 import io.kotest.assertions.assertSoftly
 import kotlin.random.Random
 import kotlin.test.Test
@@ -1197,6 +1198,34 @@ class SuccessOrSingleErrorTest {
         val result =
             Try.seed<String>(initialValue)
                 .asSuccessOrSingleError()
+                .toMaybeError()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `either as success or single error with right as success must return success success or single error if either was initiated as right`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Either
+                .Right
+                .of<Int, _>(initialValue)
+                .asSuccessOrSingleErrorWithRightAsSuccess()
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `either as success or single error with right as success must return error success or single error if either was initiated as left`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Either
+                .Left
+                .of<_, Int>(initialValue)
+                .asSuccessOrSingleErrorWithRightAsSuccess()
                 .toMaybeError()
                 .orNull()!!
 

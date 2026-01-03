@@ -189,3 +189,9 @@ fun <SUCCESS : Any> Try<SUCCESS>.asSuccessOrSingleError() =
         { SuccessOrSingleError.Success.of<_, Throwable>(it) },
         { SuccessOrSingleError.Error.of(it) }
     )
+
+fun <LEFT : Any, RIGHT : Any> Either<LEFT, RIGHT>.asSuccessOrSingleErrorWithRightAsSuccess() =
+    this.fold(
+        { SuccessOrSingleError.Success.of<_, LEFT>(it) },
+        { SuccessOrSingleError.Error.of(it) }
+    )
