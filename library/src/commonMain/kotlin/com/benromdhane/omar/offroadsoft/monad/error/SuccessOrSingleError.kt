@@ -1,5 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
+import com.benromdhane.omar.offroadsoft.monad.Either
 import com.benromdhane.omar.offroadsoft.monad.Maybe
 import kotlin.reflect.KClass
 
@@ -42,6 +43,8 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         errorType: KClass<ERROR_TYPE>,
         alternativeSuccess: () -> SUCCESS
     ): SuccessOrSingleError<SUCCESS, ERROR>
+
+    fun toEither(): Either<ERROR, SUCCESS>
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
@@ -101,6 +104,8 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         override fun <ERROR_TYPE : ERROR> toSuccess(alternativeSuccess: SUCCESS, errorType: KClass<ERROR_TYPE>) = this
         override fun <ERROR_TYPE : ERROR> toSuccess(errorType: KClass<ERROR_TYPE>, alternativeSuccess: () -> SUCCESS) =
             this
+
+        override fun toEither() = Either.Right.of<ERROR, _>(this.success)
 
         companion object Builder {
 
@@ -164,6 +169,8 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
                 alternativeSuccess,
                 errorType::isInstance
             )
+
+        override fun toEither() = Either.Left.of<_, SUCCESS>(this.error)
 
         companion object Builder {
 

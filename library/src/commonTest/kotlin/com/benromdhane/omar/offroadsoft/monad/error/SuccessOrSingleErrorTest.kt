@@ -1094,4 +1094,32 @@ class SuccessOrSingleErrorTest {
             assertEquals(alternativeSuccess, result)
         }
     }
+
+    @Test
+    fun `to either must return left either with error value if success or single error was initiated as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .toEither()
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertEquals(initialError, result)
+    }
+
+    @Test
+    fun `to either must return right either with success value if success or single error was initiated as success`() {
+        val initialSuccess = Uuid.random().toString()
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .toEither()
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(initialSuccess, result)
+    }
 }
