@@ -826,4 +826,120 @@ class SuccessOrSingleErrorTest {
             assertEquals(alternativeSuccess, result)
         }
     }
+
+    @Test
+    fun `to success with error condition and alternative success provider must return success with initial success if initial success or single error was initiated as success and condition is not valid`() {
+        val initialSuccess = Uuid.random().toString()
+        var conditionEvaluated = false
+        var alternativeEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .toSuccess(
+                    {
+                        alternativeEvaluated = true
+                        Uuid.random().toString()
+                    },
+                    {
+                        conditionEvaluated = true
+                        false
+                    }
+                )
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { alternativeEvaluated }
+            assertFalse { conditionEvaluated }
+            assertEquals(initialSuccess, result)
+        }
+    }
+
+    @Test
+    fun `to success with error condition and alternative success provider must return success with initial success if initial success or single error was initiated as success and condition is valid`() {
+        val initialSuccess = Uuid.random().toString()
+        var alternativeEvaluated = false
+        var conditionEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .toSuccess(
+                    {
+                        alternativeEvaluated = true
+                        Uuid.random().toString()
+                    },
+                    {
+                        conditionEvaluated = true
+                        true
+                    }
+                )
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { alternativeEvaluated }
+            assertFalse { conditionEvaluated }
+            assertEquals(initialSuccess, result)
+        }
+    }
+
+    @Test
+    fun `to success with error condition and alternative success provider must return error if initial success or single error was initiated as error and condition is not valid`() {
+        val initialError = Exception(Uuid.random().toString())
+        var alternativeEvaluated = false
+        var conditionEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .toSuccess(
+                    {
+                        alternativeEvaluated = true
+                        Uuid.random().toString()
+                    },
+                    {
+                        conditionEvaluated = true
+                        false
+                    }
+                )
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { alternativeEvaluated }
+            assertTrue { conditionEvaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `to success with error condition and alternative success provider must return success with alternative success if initial success or single error was initiated as error and condition is valid`() {
+        val alternativeSuccess = Uuid.random().toString()
+        var alternativeEvaluated = false
+        var conditionEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .toSuccess(
+                    {
+                        alternativeEvaluated = true
+                        alternativeSuccess
+                    },
+                    {
+                        conditionEvaluated = true
+                        true
+                    }
+                )
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { alternativeEvaluated }
+            assertTrue { conditionEvaluated }
+            assertEquals(alternativeSuccess, result)
+        }
+    }
 }
