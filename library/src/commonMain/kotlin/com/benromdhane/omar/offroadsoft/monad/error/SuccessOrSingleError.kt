@@ -201,3 +201,9 @@ fun <LEFT : Any, RIGHT : Any> Either<LEFT, RIGHT>.asSuccessOrSingleErrorWithLeft
         { SuccessOrSingleError.Error.of<LEFT, _>(it) },
         { SuccessOrSingleError.Success.of(it) }
     )
+
+fun <SUCCESS : Any, ERROR : Throwable> SuccessOrSingleError<SUCCESS, ERROR>.asTry() =
+    this.fold(
+        { Try.seed(it) },
+        { Try.seed(it) }
+    )
