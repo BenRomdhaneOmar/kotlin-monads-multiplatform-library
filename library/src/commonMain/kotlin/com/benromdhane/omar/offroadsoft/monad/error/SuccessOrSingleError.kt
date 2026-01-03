@@ -11,6 +11,7 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
     fun <NEW_SUCCESS : Any> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS): SuccessOrSingleError<NEW_SUCCESS, ERROR>
     fun <NEW_ERROR : Any> mapError(mapper: (ERROR) -> NEW_ERROR): SuccessOrSingleError<SUCCESS, NEW_ERROR>
     fun <NEW_SUCCESS : Any> flatMapSuccess(mapper: (SUCCESS) -> SuccessOrSingleError<NEW_SUCCESS, ERROR>): SuccessOrSingleError<NEW_SUCCESS, ERROR>
+    fun filterSuccess(alternativeError: ERROR, condition: (SUCCESS) -> Boolean): SuccessOrSingleError<SUCCESS, ERROR>
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
@@ -26,6 +27,15 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         override fun <NEW_ERROR : Any> mapError(mapper: (ERROR) -> NEW_ERROR) = Success<_, NEW_ERROR>(this.success)
         override fun <NEW_SUCCESS : Any> flatMapSuccess(mapper: (SUCCESS) -> SuccessOrSingleError<NEW_SUCCESS, ERROR>) =
             mapper(this.success)
+
+        override fun filterSuccess(
+            alternativeError: ERROR,
+            condition: (SUCCESS) -> Boolean
+        ) =
+            if (condition(this.success))
+                this
+            else
+                Error.of(alternativeError)
 
         companion object Builder {
 
@@ -47,6 +57,8 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         override fun <NEW_ERROR : Any> mapError(mapper: (ERROR) -> NEW_ERROR) = Error<SUCCESS, _>(mapper(this.error))
         override fun <NEW_SUCCESS : Any> flatMapSuccess(mapper: (SUCCESS) -> SuccessOrSingleError<NEW_SUCCESS, ERROR>) =
             Error<NEW_SUCCESS, ERROR>(this.error)
+
+        override fun filterSuccess(alternativeError: ERROR, condition: (SUCCESS) -> Boolean) = this
 
         companion object Builder {
 
