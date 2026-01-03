@@ -672,4 +672,32 @@ class SuccessOrSingleErrorTest {
             assertEquals(initialSuccess, result)
         }
     }
+
+    @Test
+    fun `to success must return success with initial value if success or single error was initiated as success`() {
+        val initialSuccess = Uuid.random().toString()
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .toSuccess(Uuid.random().toString())
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialSuccess, result)
+    }
+
+    @Test
+    fun `to success must return success with alternative value if success or single error was initiated as failure`() {
+        val alternativeSuccess = Uuid.random().toString()
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .toSuccess(alternativeSuccess)
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(alternativeSuccess, result)
+    }
 }
