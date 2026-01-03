@@ -195,3 +195,9 @@ fun <LEFT : Any, RIGHT : Any> Either<LEFT, RIGHT>.asSuccessOrSingleErrorWithRigh
         { SuccessOrSingleError.Success.of<_, LEFT>(it) },
         { SuccessOrSingleError.Error.of(it) }
     )
+
+fun <LEFT : Any, RIGHT : Any> Either<LEFT, RIGHT>.asSuccessOrSingleErrorWithLeftAsSuccess() =
+    this.fold(
+        { SuccessOrSingleError.Error.of<LEFT, _>(it) },
+        { SuccessOrSingleError.Success.of(it) }
+    )

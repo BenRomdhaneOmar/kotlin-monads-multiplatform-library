@@ -1231,4 +1231,32 @@ class SuccessOrSingleErrorTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `either as success or single error with left as success must return success success or single error if either was initiated as left`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            Either
+                .Left
+                .of<_, Int>(initialValue)
+                .asSuccessOrSingleErrorWithLeftAsSuccess()
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `either as success or single error with left as success must return error success or single error if either was initiated as right`() {
+        val initialValue = Exception(Uuid.random().toString())
+        val result =
+            Either
+                .Right
+                .of<Int, _>(initialValue)
+                .asSuccessOrSingleErrorWithLeftAsSuccess()
+                .toMaybeError()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
 }
