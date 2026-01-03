@@ -1,5 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
+import io.kotest.assertions.assertSoftly
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -102,5 +103,45 @@ class SuccessOrSingleErrorTest {
                 .empty()
 
         assertTrue { result }
+    }
+
+    @Test
+    fun `map success must transform the initial success value if success or single error was initiated as success`() {
+        val initialSuccess = Uuid.random().toString()
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .mapSuccess {
+                    evaluated = true
+                    it.length
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(initialSuccess.length, result)
+        }
+    }
+
+    @Test
+    fun `map success must be ignored if success or single error was initiated as error`() {
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .mapSuccess {
+                    evaluated = true
+                    it.length
+                }
+                .error()
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertTrue { result }
+        }
     }
 }

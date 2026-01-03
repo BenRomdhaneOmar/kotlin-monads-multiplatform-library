@@ -8,6 +8,7 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
     fun error() = success().not()
     fun toMaybeSuccess(): Maybe<SUCCESS>
     fun toMaybeError(): Maybe<ERROR>
+    fun <NEW_SUCCESS : Any> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS): SuccessOrSingleError<NEW_SUCCESS, ERROR>
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
@@ -17,6 +18,8 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         override fun success() = true
         override fun toMaybeSuccess() = Maybe.NotEmpty.of(this.success)
         override fun toMaybeError() = Maybe.Empty.of<ERROR>()
+        override fun <NEW_SUCCESS : Any> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS) =
+            Success<_, ERROR>(mapper(this.success))
 
         companion object Builder {
 
@@ -32,6 +35,8 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         override fun success() = false
         override fun toMaybeSuccess() = Maybe.Empty.of<SUCCESS>()
         override fun toMaybeError() = Maybe.NotEmpty.of(this.error)
+        override fun <NEW_SUCCESS : Any> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS) =
+            Error<NEW_SUCCESS, _>(this.error)
 
         companion object Builder {
 
