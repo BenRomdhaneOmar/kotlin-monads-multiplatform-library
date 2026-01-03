@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
 import com.benromdhane.omar.offroadsoft.monad.Maybe
+import kotlin.reflect.KClass
 
 sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
 
@@ -30,6 +31,11 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
     fun toSuccess(
         alternativeSuccess: () -> SUCCESS,
         condition: (ERROR) -> Boolean
+    ): SuccessOrSingleError<SUCCESS, ERROR>
+
+    fun <ERROR_TYPE : ERROR> toSuccess(
+        alternativeSuccess: SUCCESS,
+        errorType: KClass<ERROR_TYPE>
     ): SuccessOrSingleError<SUCCESS, ERROR>
 
     @ConsistentCopyVisibility
@@ -87,6 +93,7 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         override fun toSuccess(alternativeSuccess: () -> SUCCESS) = this
         override fun toSuccess(alternativeSuccess: SUCCESS, condition: (ERROR) -> Boolean) = this
         override fun toSuccess(alternativeSuccess: () -> SUCCESS, condition: (ERROR) -> Boolean) = this
+        override fun <ERROR_TYPE : ERROR> toSuccess(alternativeSuccess: SUCCESS, errorType: KClass<ERROR_TYPE>) = this
 
         companion object Builder {
 
@@ -132,6 +139,15 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
                 Success.of(alternativeSuccess())
             else
                 this
+
+        override fun <ERROR_TYPE : ERROR> toSuccess(
+            alternativeSuccess: SUCCESS,
+            errorType: KClass<ERROR_TYPE>
+        ) =
+            toSuccess(
+                alternativeSuccess,
+                errorType::isInstance
+            )
 
         companion object Builder {
 
