@@ -1122,4 +1122,60 @@ class SuccessOrSingleErrorTest {
 
         assertEquals(initialSuccess, result)
     }
+
+    @Test
+    fun `fold must return mapped error value if success or single error was initiated as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val errorResult = Random.nextInt()
+        var successMapperEvaluated = false
+        var errorMapperEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .fold(
+                    {
+                        successMapperEvaluated = true
+                        Random.nextInt()
+                    },
+                    {
+                        errorMapperEvaluated = true
+                        errorResult
+                    }
+                )
+
+        assertSoftly {
+            assertFalse { successMapperEvaluated }
+            assertTrue { errorMapperEvaluated }
+            assertEquals(errorResult, result)
+        }
+    }
+
+    @Test
+    fun `to fold must return mapped success value if success or single error was initiated as success`() {
+        val initialSuccess = Uuid.random().toString()
+        val successResult = Random.nextInt()
+        var successMapperEvaluated = false
+        var errorMapperEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .fold(
+                    {
+                        successMapperEvaluated = true
+                        successResult
+                    },
+                    {
+                        errorMapperEvaluated = true
+                        Random.nextInt()
+                    }
+                )
+
+        assertSoftly {
+            assertTrue { successMapperEvaluated }
+            assertFalse { errorMapperEvaluated }
+            assertEquals(successResult, result)
+        }
+    }
 }

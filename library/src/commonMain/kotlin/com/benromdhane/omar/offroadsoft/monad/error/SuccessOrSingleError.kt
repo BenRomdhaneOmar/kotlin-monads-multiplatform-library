@@ -45,6 +45,7 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
     ): SuccessOrSingleError<SUCCESS, ERROR>
 
     fun toEither(): Either<ERROR, SUCCESS>
+    fun <RESULT> fold(successMapper: (SUCCESS) -> RESULT, errorMapper: (ERROR) -> RESULT): RESULT
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
@@ -106,6 +107,8 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
             this
 
         override fun toEither() = Either.Right.of<ERROR, _>(this.success)
+        override fun <RESULT> fold(successMapper: (SUCCESS) -> RESULT, errorMapper: (ERROR) -> RESULT) =
+            successMapper(this.success)
 
         companion object Builder {
 
@@ -171,6 +174,8 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
             )
 
         override fun toEither() = Either.Left.of<_, SUCCESS>(this.error)
+        override fun <RESULT> fold(successMapper: (SUCCESS) -> RESULT, errorMapper: (ERROR) -> RESULT) =
+            errorMapper(this.error)
 
         companion object Builder {
 
