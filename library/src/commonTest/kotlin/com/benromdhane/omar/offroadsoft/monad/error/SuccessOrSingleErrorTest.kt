@@ -144,4 +144,45 @@ class SuccessOrSingleErrorTest {
             assertTrue { result }
         }
     }
+
+    @Test
+    fun `map error must transform the initial error value if success or single error was initiated as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val newError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .mapError {
+                    evaluated = true
+                    newError
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(newError, result)
+        }
+    }
+
+    @Test
+    fun `map error must be ignored if success or single error was initiated as success`() {
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .mapError {
+                    evaluated = true
+                    it.message!!
+                }
+                .success()
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertTrue { result }
+        }
+    }
 }
