@@ -38,6 +38,11 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         errorType: KClass<ERROR_TYPE>
     ): SuccessOrSingleError<SUCCESS, ERROR>
 
+    fun <ERROR_TYPE : ERROR> toSuccess(
+        errorType: KClass<ERROR_TYPE>,
+        alternativeSuccess: () -> SUCCESS
+    ): SuccessOrSingleError<SUCCESS, ERROR>
+
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
         val success: SUCCESS
@@ -94,6 +99,8 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         override fun toSuccess(alternativeSuccess: SUCCESS, condition: (ERROR) -> Boolean) = this
         override fun toSuccess(alternativeSuccess: () -> SUCCESS, condition: (ERROR) -> Boolean) = this
         override fun <ERROR_TYPE : ERROR> toSuccess(alternativeSuccess: SUCCESS, errorType: KClass<ERROR_TYPE>) = this
+        override fun <ERROR_TYPE : ERROR> toSuccess(errorType: KClass<ERROR_TYPE>, alternativeSuccess: () -> SUCCESS) =
+            this
 
         companion object Builder {
 
@@ -143,6 +150,15 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         override fun <ERROR_TYPE : ERROR> toSuccess(
             alternativeSuccess: SUCCESS,
             errorType: KClass<ERROR_TYPE>
+        ) =
+            toSuccess(
+                { alternativeSuccess },
+                errorType::isInstance
+            )
+
+        override fun <ERROR_TYPE : ERROR> toSuccess(
+            errorType: KClass<ERROR_TYPE>,
+            alternativeSuccess: () -> SUCCESS
         ) =
             toSuccess(
                 alternativeSuccess,

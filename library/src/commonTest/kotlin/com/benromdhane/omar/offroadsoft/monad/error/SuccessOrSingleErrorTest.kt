@@ -1010,4 +1010,88 @@ class SuccessOrSingleErrorTest {
 
         assertEquals(alternativeSuccess, result)
     }
+
+    @Test
+    fun `to success with error type condition and alternative success provider must return success with initial success if initial success or single error was initiated as success and type is not valid`() {
+        val initialSuccess = Uuid.random().toString()
+        var alternativeEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .toSuccess(IllegalArgumentException::class) {
+                    alternativeEvaluated = true
+                    Uuid.random().toString()
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { alternativeEvaluated }
+            assertEquals(initialSuccess, result)
+        }
+    }
+
+    @Test
+    fun `to success with error type condition and alternative success provider must return success with initial success if initial success or single error was initiated as success and type is valid`() {
+        val initialSuccess = Uuid.random().toString()
+        var alternativeEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .toSuccess(Throwable::class) {
+                    alternativeEvaluated = true
+                    Uuid.random().toString()
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { alternativeEvaluated }
+            assertEquals(initialSuccess, result)
+        }
+    }
+
+    @Test
+    fun `to success with error type condition and alternative success provider must return error if initial success or single error was initiated as error and type is not valid`() {
+        val initialError = Exception(Uuid.random().toString())
+        var alternativeEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .toSuccess(IllegalArgumentException::class) {
+                    alternativeEvaluated = true
+                    Uuid.random().toString()
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { alternativeEvaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `to success with error type condition and alternative success provider must return success with alternative success if initial success or single error was initiated as error and type is valid`() {
+        val alternativeSuccess = Uuid.random().toString()
+        var alternativeEvaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .toSuccess(Exception::class) {
+                    alternativeEvaluated = true
+                    alternativeSuccess
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { alternativeEvaluated }
+            assertEquals(alternativeSuccess, result)
+        }
+    }
 }
