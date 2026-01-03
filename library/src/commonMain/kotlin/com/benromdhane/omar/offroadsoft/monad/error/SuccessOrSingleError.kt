@@ -19,6 +19,11 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
 
     fun filterSuccessNot(alternativeError: ERROR, condition: (SUCCESS) -> Boolean): SuccessOrSingleError<SUCCESS, ERROR>
 
+    fun filterSuccessNot(
+        alternativeError: () -> ERROR,
+        condition: (SUCCESS) -> Boolean
+    ): SuccessOrSingleError<SUCCESS, ERROR>
+
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
         val success: SUCCESS
@@ -56,10 +61,19 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
             alternativeError: ERROR,
             condition: (SUCCESS) -> Boolean
         ) =
+            filterSuccessNot(
+                { alternativeError },
+                condition
+            )
+
+        override fun filterSuccessNot(
+            alternativeError: () -> ERROR,
+            condition: (SUCCESS) -> Boolean
+        ) =
             if (condition(this.success).not())
                 this
             else
-                Error.of(alternativeError)
+                Error.of(alternativeError())
 
         companion object Builder {
 
@@ -85,6 +99,7 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         override fun filterSuccess(alternativeError: ERROR, condition: (SUCCESS) -> Boolean) = this
         override fun filterSuccess(alternativeError: () -> ERROR, condition: (SUCCESS) -> Boolean) = this
         override fun filterSuccessNot(alternativeError: ERROR, condition: (SUCCESS) -> Boolean) = this
+        override fun filterSuccessNot(alternativeError: () -> ERROR, condition: (SUCCESS) -> Boolean) = this
 
         companion object Builder {
 
