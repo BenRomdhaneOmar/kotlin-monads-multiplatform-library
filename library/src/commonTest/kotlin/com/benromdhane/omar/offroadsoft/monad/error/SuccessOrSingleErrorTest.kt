@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
 import io.kotest.assertions.assertSoftly
+import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -469,6 +470,90 @@ class SuccessOrSingleErrorTest {
             assertTrue { conditionEvaluated }
             assertTrue { providerEvaluated }
             assertEquals(alternativeError, result)
+        }
+    }
+
+    @Test
+    fun `filter success not must be ignored if initial success or single error was initiated as error and filter is not valid`() {
+        val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .filterSuccessNot(Exception(Uuid.random().toString())) {
+                    evaluated = true
+                    false
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `filter success not must be ignored if initial success or single error was initiated as error and filter is valid`() {
+        val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .filterSuccessNot(Exception(Uuid.random().toString())) {
+                    evaluated = true
+                    true
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `filter success not must return error with initial alternative error if initial success or single error was initiated as success and filter is valid`() {
+        var evaluated = false
+        val alternativeError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Random.nextInt(100, 1_000))
+                .filterSuccessNot(alternativeError) {
+                    evaluated = true
+                    it >= 100
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeError, result)
+        }
+    }
+
+    @Test
+    fun `filter success not must return success with initial value if initial success or single error was initiated as success and filter is not valid`() {
+        val initialSuccess = Random.nextInt(100, 1_000)
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .filterSuccessNot(Exception(Uuid.random().toString())) {
+                    evaluated = true
+                    it < 100
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(initialSuccess, result)
         }
     }
 }
