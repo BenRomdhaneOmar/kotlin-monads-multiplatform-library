@@ -30,4 +30,26 @@ class SuccessOrSingleErrorTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `error must return true if success of single error was initiated as error`() {
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .error()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `error must return false if success of single error was initiated as success`() {
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .error()
+
+        assertFalse { result }
+    }
 }

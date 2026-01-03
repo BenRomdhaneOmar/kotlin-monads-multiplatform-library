@@ -3,6 +3,7 @@ package com.benromdhane.omar.offroadsoft.monad.error
 sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
 
     fun success(): Boolean
+    fun error() = success().not()
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
