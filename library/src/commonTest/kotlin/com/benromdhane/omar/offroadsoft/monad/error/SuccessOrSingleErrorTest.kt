@@ -700,4 +700,46 @@ class SuccessOrSingleErrorTest {
 
         assertEquals(alternativeSuccess, result)
     }
+
+    @Test
+    fun `to success with alternative provider must return success with initial value if success or single error was initiated as success`() {
+        val initialSuccess = Uuid.random().toString()
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .toSuccess {
+                    evaluated = true
+                    Uuid.random().toString()
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialSuccess, result)
+        }
+    }
+
+    @Test
+    fun `to success with alternative provider must return success with alternative value if success or single error was initiated as failure`() {
+        val alternativeSuccess = Uuid.random().toString()
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .toSuccess {
+                    evaluated = true
+                    alternativeSuccess
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeSuccess, result)
+        }
+    }
 }

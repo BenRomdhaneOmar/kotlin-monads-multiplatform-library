@@ -25,6 +25,7 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
     ): SuccessOrSingleError<SUCCESS, ERROR>
 
     fun toSuccess(alternativeSuccess: SUCCESS): SuccessOrSingleError<SUCCESS, ERROR>
+    fun toSuccess(alternativeSuccess: () -> SUCCESS): SuccessOrSingleError<SUCCESS, ERROR>
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
@@ -78,6 +79,7 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
                 Error.of(alternativeError())
 
         override fun toSuccess(alternativeSuccess: SUCCESS) = this
+        override fun toSuccess(alternativeSuccess: () -> SUCCESS) = this
 
         companion object Builder {
 
@@ -104,7 +106,8 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
         override fun filterSuccess(alternativeError: () -> ERROR, condition: (SUCCESS) -> Boolean) = this
         override fun filterSuccessNot(alternativeError: ERROR, condition: (SUCCESS) -> Boolean) = this
         override fun filterSuccessNot(alternativeError: () -> ERROR, condition: (SUCCESS) -> Boolean) = this
-        override fun toSuccess(alternativeSuccess: SUCCESS) = Success.of<_, ERROR>(alternativeSuccess)
+        override fun toSuccess(alternativeSuccess: SUCCESS) = toSuccess { alternativeSuccess }
+        override fun toSuccess(alternativeSuccess: () -> SUCCESS) = Success.of<_, ERROR>(alternativeSuccess())
 
         companion object Builder {
 
