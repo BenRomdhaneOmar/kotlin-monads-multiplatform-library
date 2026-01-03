@@ -185,4 +185,90 @@ class SuccessOrSingleErrorTest {
             assertTrue { result }
         }
     }
+
+    @Test
+    fun `flat map success must return error with initial error if initial success or single error was initiated as error and mapping result is error success or single error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val newError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccess {
+                    evaluated = true
+                    SuccessOrSingleError.Error.of<String, _>(newError)
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `flat map success must return error with initial error if initial success or single error was initiated as error and mapping result is success success or single error`() {
+        val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccess {
+                    evaluated = true
+                    SuccessOrSingleError.Success.of(Uuid.random().toString())
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `flat map success must return error if initial success or single error was initiated as success and mapping result is error success or single error`() {
+        val error = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .flatMapSuccess {
+                    evaluated = true
+                    SuccessOrSingleError.Error.of<String, _>(error)
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(error, result)
+        }
+    }
+
+    @Test
+    fun `flat map success must return success if initial success or single error was initiated as success and mapping result is success success or single error`() {
+        val initialSuccess = Uuid.random().toString()
+        val newSuccess = Uuid.random().toString()
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialSuccess)
+                .flatMapSuccess {
+                    evaluated = true
+                    SuccessOrSingleError.Success.of(newSuccess)
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(newSuccess, result)
+        }
+    }
 }
