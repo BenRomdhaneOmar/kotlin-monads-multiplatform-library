@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlin.uuid.ExperimentalUuidApi
@@ -51,5 +52,30 @@ class SuccessOrSingleErrorTest {
                 .error()
 
         assertFalse { result }
+    }
+
+    @Test
+    fun `to maybe success must return empty maybe if success of single error was initiated as error`() {
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .toMaybeSuccess()
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to maybe success must return maybe with initial value if success of single error was initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialValue)
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
     }
 }
