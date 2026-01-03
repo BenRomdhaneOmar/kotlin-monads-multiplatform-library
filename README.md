@@ -41,7 +41,11 @@
 
 ### Possible error:
 
-[Possible Error test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/error/PossibleErrorTest.kt)
+[Possible error test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/error/PossibleErrorTest.kt)
+
+### Success or single error:
+
+[Success or single error test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/error/SuccessOrSingleErrorTest.kt)
 
 ## Run tests for all targets:
 

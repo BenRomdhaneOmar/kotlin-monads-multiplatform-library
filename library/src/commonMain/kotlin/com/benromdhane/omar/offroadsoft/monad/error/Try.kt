@@ -18,7 +18,7 @@ sealed interface Try<SUCCESS : Any> {
     fun recover(alternative: SUCCESS, condition: (Throwable) -> Boolean): Try<SUCCESS>
     fun <FAILURE : Throwable> recover(alternative: SUCCESS, failureType: KClass<FAILURE>): Try<SUCCESS>
     fun recover(alternative: () -> SUCCESS, condition: (Throwable) -> Boolean): Try<SUCCESS>
-    fun <FAILURE : Throwable> recover(alternative: () -> SUCCESS, failureType: KClass<FAILURE>): Try<SUCCESS>
+    fun <FAILURE : Throwable> recover(failureType: KClass<FAILURE>, alternative: () -> SUCCESS): Try<SUCCESS>
     fun filterSuccess(alternative: Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
     fun filterSuccess(alternative: () -> Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
     fun filterSuccessNot(alternative: Throwable, condition: (SUCCESS) -> Boolean): Try<SUCCESS>
@@ -63,7 +63,7 @@ sealed interface Try<SUCCESS : Any> {
         override fun <FAILURE : Throwable> recover(alternative: SUCCESS, failureType: KClass<FAILURE>) = this
 
         override fun recover(alternative: () -> SUCCESS, condition: (Throwable) -> Boolean) = this
-        override fun <FAILURE : Throwable> recover(alternative: () -> SUCCESS, failureType: KClass<FAILURE>) = this
+        override fun <FAILURE : Throwable> recover(failureType: KClass<FAILURE>, alternative: () -> SUCCESS) = this
         override fun filterSuccess(
             alternative: Throwable,
             condition: (SUCCESS) -> Boolean
@@ -160,8 +160,8 @@ sealed interface Try<SUCCESS : Any> {
                 this
 
         override fun <FAILURE : Throwable> recover(
-            alternative: () -> SUCCESS,
-            failureType: KClass<FAILURE>
+            failureType: KClass<FAILURE>,
+            alternative: () -> SUCCESS
         ) =
             recover(
                 alternative,

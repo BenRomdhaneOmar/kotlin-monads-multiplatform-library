@@ -457,7 +457,10 @@ class TryTest {
         }
         val result =
             Try.seed(initialValue)
-                .recover(alternativeValue, Throwable::class)
+                .recover(
+                    Throwable::class,
+                    alternativeValue
+                )
                 .toMaybeSuccess()
                 .orNull()!!
 
@@ -478,7 +481,10 @@ class TryTest {
         }
         val result =
             Try.seed<String>(initialValue)
-                .recover(alternativeValue, Exception::class)
+                .recover(
+                    Exception::class,
+                    alternativeValue
+                )
                 .toMaybeSuccess()
                 .orNull()!!
 
@@ -498,7 +504,10 @@ class TryTest {
         }
         val result =
             Try.seed(initialValue)
-                .recover(alternativeValue, IllegalArgumentException::class)
+                .recover(
+                    IllegalArgumentException::class,
+                    alternativeValue
+                )
                 .toMaybeSuccess()
                 .orNull()!!
 
@@ -518,7 +527,10 @@ class TryTest {
         }
         val result =
             Try.seed<String>(initialValue)
-                .recover(alternativeValue, IllegalArgumentException::class)
+                .recover(
+                    IllegalArgumentException::class,
+                    alternativeValue
+                )
                 .toMaybeFailure()
                 .orNull()!!
 
