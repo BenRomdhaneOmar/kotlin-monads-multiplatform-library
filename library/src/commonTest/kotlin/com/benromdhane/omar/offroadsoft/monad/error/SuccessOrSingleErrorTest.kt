@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
 import com.benromdhane.omar.offroadsoft.monad.Either
+import com.benromdhane.omar.offroadsoft.monad.Maybe
 import io.kotest.assertions.assertSoftly
 import kotlin.random.Random
 import kotlin.test.Test
@@ -1286,5 +1287,198 @@ class SuccessOrSingleErrorTest {
                 .orNull()!!
 
         assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `flat map success with possible error as mapper result must return possible error with initial error if success or single error was initiated as error and mapper result is error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val newError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccessToPossibleError {
+                    evaluated = true
+                    PossibleError.Error.of(newError)
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `flat map success with possible error as mapper result must return possible error with initial error if success or single error was initiated as error and mapper result is success`() {
+        val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccessToPossibleError {
+                    evaluated = true
+                    PossibleError.Success.of()
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `flat map success with possible error as mapper result must return possible error with mapper error if success or single error was initiated as success and mapper result is error`() {
+        val initialValue = Uuid.random().toString()
+        val error = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialValue)
+                .flatMapSuccessToPossibleError {
+                    evaluated = true
+                    PossibleError.Error.of(error)
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(error, result)
+        }
+    }
+
+    @Test
+    fun `flat map success with possible error as mapper result must return possible error success if success or single error was initiated as success and mapper result is success`() {
+        val initialValue = Uuid.random().toString()
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialValue)
+                .flatMapSuccessToPossibleError {
+                    evaluated = true
+                    PossibleError.Success.of()
+                }
+                .error()
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertFalse { result }
+        }
+    }
+
+    @Test
+    fun `flat map success with maybe error as mapper result must return maybe with initial error if success or single error was initiated as error and mapper result is not empty`() {
+        val initialError = Exception(Uuid.random().toString())
+        val newError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccessToMaybe {
+                    evaluated = true
+                    Maybe.NotEmpty.of(newError)
+                }
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `flat map success with maybe error as mapper result must return maybe with initial error if success or single error was initiated as error and mapper result is empty`() {
+        val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccessToMaybe {
+                    evaluated = true
+                    Maybe.Empty.of()
+                }
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `flat map success with maybe error as mapper result must return maybe with mapper error if success or single error was initiated as success and mapper result is not empty`() {
+        val initialValue = Uuid.random().toString()
+        val error = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialValue)
+                .flatMapSuccessToMaybe {
+                    evaluated = true
+                    Maybe.NotEmpty.of(error)
+                }
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(error, result)
+        }
+    }
+
+    @Test
+    fun `flat map success with maybe error as mapper result must return empty maybe if success or single error was initiated as success and mapper result is empty`() {
+        val initialValue = Uuid.random().toString()
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialValue)
+                .flatMapSuccessToMaybe {
+                    evaluated = true
+                    Maybe.Empty.of()
+                }
+                .empty()
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertTrue { result }
+        }
+    }
+
+    @Test
+    fun `as possible error must return success possible error if initial success or single error is success`() {
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .asPossibleError()
+                .error()
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `as possible error must return error possible error if initial success or single error is error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .asPossibleError()
+                .toMaybeError()
+                .orNull()!!
+
+        assertEquals(initialError, result)
     }
 }

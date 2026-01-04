@@ -27,6 +27,7 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
     ): SuccessOrSingleError<SUCCESS, ERROR>
 
     fun toSuccess(alternativeSuccess: SUCCESS): SuccessOrSingleError<SUCCESS, ERROR>
+
     fun toSuccess(alternativeSuccess: () -> SUCCESS): SuccessOrSingleError<SUCCESS, ERROR>
     fun toSuccess(alternativeSuccess: SUCCESS, condition: (ERROR) -> Boolean): SuccessOrSingleError<SUCCESS, ERROR>
     fun toSuccess(
@@ -207,3 +208,26 @@ fun <SUCCESS : Any, ERROR : Throwable> SuccessOrSingleError<SUCCESS, ERROR>.asTr
         { Try.seed(it) },
         { Try.seed(it) }
     )
+
+fun <SUCCESS : Any, ERROR : Any> SuccessOrSingleError<SUCCESS, ERROR>.flatMapSuccessToPossibleError(mapper: (SUCCESS) -> PossibleError<ERROR>) =
+    this
+        .fold(
+            mapper
+        ) {
+            PossibleError.Error.of(it)
+        }
+
+fun <SUCCESS : Any, ERROR : Any> SuccessOrSingleError<SUCCESS, ERROR>.flatMapSuccessToMaybe(mapper: (SUCCESS) -> Maybe<ERROR>) =
+    this
+        .fold(
+            mapper
+        ) {
+            Maybe.NotEmpty.of(it)
+        }
+
+fun <SUCCESS : Any, ERROR : Any> SuccessOrSingleError<SUCCESS, ERROR>.asPossibleError() =
+    this
+        .fold(
+            { PossibleError.Success.of() },
+            { PossibleError.Error.of(it) },
+        )
