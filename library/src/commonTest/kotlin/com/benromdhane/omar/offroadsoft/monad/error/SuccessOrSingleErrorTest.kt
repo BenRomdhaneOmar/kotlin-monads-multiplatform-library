@@ -1455,4 +1455,30 @@ class SuccessOrSingleErrorTest {
             assertTrue { result }
         }
     }
+
+    @Test
+    fun `as possible error must return success possible error if initial success or single error is success`() {
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .asPossibleError()
+                .error()
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `as possible error must return error possible error if initial success or single error is error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .asPossibleError()
+                .toMaybeError()
+                .orNull()!!
+
+        assertEquals(initialError, result)
+    }
 }

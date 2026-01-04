@@ -224,3 +224,10 @@ fun <SUCCESS : Any, ERROR : Any> SuccessOrSingleError<SUCCESS, ERROR>.flatMapSuc
         ) {
             Maybe.NotEmpty.of(it)
         }
+
+fun <SUCCESS : Any, ERROR : Any> SuccessOrSingleError<SUCCESS, ERROR>.asPossibleError() =
+    this
+        .fold(
+            { PossibleError.Success.of() },
+            { PossibleError.Error.of(it) },
+        )
