@@ -1287,4 +1287,89 @@ class SuccessOrSingleErrorTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `flat map success with possible error as mapper result must return possible error with initial error if success or single error was initiated as error and mapper result is error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val newError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccess<_, _> {
+                    evaluated = true
+                    PossibleError.Error.of(newError)
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `flat map success with possible error as mapper result must return possible error with initial error if success or single error was initiated as error and mapper result is success`() {
+        val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccess<_, _> {
+                    evaluated = true
+                    PossibleError.Success.of()
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialError, result)
+        }
+    }
+
+    @Test
+    fun `flat map success with possible error as mapper result must return possible error with mapper error if success or single error was initiated as success and mapper result is error`() {
+        val initialValue = Uuid.random().toString()
+        val error = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialValue)
+                .flatMapSuccess<_, _> {
+                    evaluated = true
+                    PossibleError.Error.of(error)
+                }
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(error, result)
+        }
+    }
+
+    @Test
+    fun `flat map success with possible error as mapper result must return possible error success if success or single error was initiated as success and mapper result is success`() {
+        val initialValue = Uuid.random().toString()
+        var evaluated = false
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialValue)
+                .flatMapSuccess<_, _> {
+                    evaluated = true
+                    PossibleError.Success.of()
+                }
+                .error()
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertFalse { result }
+        }
+    }
 }
