@@ -209,9 +209,18 @@ fun <SUCCESS : Any, ERROR : Throwable> SuccessOrSingleError<SUCCESS, ERROR>.asTr
         { Try.seed(it) }
     )
 
-fun <SUCCESS : Any, ERROR : Any> SuccessOrSingleError<SUCCESS, ERROR>.flatMapSuccess(mapper: (SUCCESS) -> PossibleError<ERROR>) =
+fun <SUCCESS : Any, ERROR : Any> SuccessOrSingleError<SUCCESS, ERROR>.flatMapSuccessToPossibleError(mapper: (SUCCESS) -> PossibleError<ERROR>) =
     this
         .fold(
-            mapper,
-            { PossibleError.Error.of(it) }
-        )
+            mapper
+        ) {
+            PossibleError.Error.of(it)
+        }
+
+fun <SUCCESS : Any, ERROR : Any> SuccessOrSingleError<SUCCESS, ERROR>.flatMapSuccessToMaybe(mapper: (SUCCESS) -> Maybe<ERROR>) =
+    this
+        .fold(
+            mapper
+        ) {
+            Maybe.NotEmpty.of(it)
+        }
