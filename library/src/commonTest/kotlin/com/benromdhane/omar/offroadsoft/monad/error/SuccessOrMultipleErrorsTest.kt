@@ -30,4 +30,26 @@ class SuccessOrMultipleErrorsTest {
 
         assertFalse { result }
     }
+
+    @Test
+    fun `success must return false if success or multiple errors created as error`() {
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .success()
+
+        assertFalse { result }
+    }
+
+    @Test
+    fun `success must return true if success or multiple errors created as success`() {
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .success()
+
+        assertTrue { result }
+    }
 }
