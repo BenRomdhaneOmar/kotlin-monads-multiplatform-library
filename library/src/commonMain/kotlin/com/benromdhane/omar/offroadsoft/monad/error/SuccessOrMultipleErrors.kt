@@ -7,6 +7,7 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
     fun error(): Boolean
     fun success() = error().not()
     fun toMaybeSuccess(): Maybe<SUCCESS>
+    fun toErrors(): Collection<ERROR>
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
@@ -15,6 +16,7 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
 
         override fun error() = false
         override fun toMaybeSuccess() = Maybe.NotEmpty.of(this.success)
+        override fun toErrors() = emptySet<ERROR>()
 
         companion object Builder {
 
@@ -30,6 +32,7 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
 
         override fun error() = true
         override fun toMaybeSuccess() = Maybe.Empty.of<SUCCESS>()
+        override fun toErrors() = this.errors
 
         companion object Builder {
 

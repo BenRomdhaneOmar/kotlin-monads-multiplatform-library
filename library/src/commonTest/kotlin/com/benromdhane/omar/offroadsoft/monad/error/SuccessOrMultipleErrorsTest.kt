@@ -1,9 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import io.kotest.assertions.assertSoftly
+import kotlin.test.*
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -77,5 +75,32 @@ class SuccessOrMultipleErrorsTest {
                 .orNull()!!
 
         assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `to errors must return errors collection contain initial error if success or multiple errors created as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `to errors must return empty collection if success or multiple errors created as success`() {
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .toErrors()
+                .isEmpty()
+
+        assertTrue { result }
     }
 }
