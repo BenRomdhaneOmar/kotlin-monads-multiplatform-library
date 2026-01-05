@@ -1,6 +1,7 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
 import io.kotest.assertions.assertSoftly
+import io.kotest.matchers.collections.shouldContainAll
 import kotlin.test.*
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -172,6 +173,38 @@ class SuccessOrMultipleErrorsTest {
                 .Success
                 .of<_, Throwable>(initialValue)
                 .addError(Exception(Uuid.random().toString()))
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `add errors with collection must append the errors to the initial errors if success or multiple errors created as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val additionalErrors = listOf(Exception(Uuid.random().toString()))
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .addErrors(additionalErrors)
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1 + additionalErrors.size, result.size)
+            assertContains(result, initialError)
+            result.shouldContainAll(additionalErrors)
+        }
+    }
+
+    @Test
+    fun `add error with collection must be ignored if success or multiple errors created as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .addErrors(listOf(Exception(Uuid.random().toString())))
                 .toMaybeSuccess()
                 .orNull()!!
 
