@@ -11,6 +11,7 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
     fun <NEW_SUCCESS : Any> mapSuccess(mapper: (SUCCESS) -> NEW_SUCCESS): SuccessOrMultipleErrors<NEW_SUCCESS, ERROR>
     fun addError(error: ERROR): SuccessOrMultipleErrors<SUCCESS, ERROR>
     fun addErrors(errors: Collection<ERROR>): SuccessOrMultipleErrors<SUCCESS, ERROR>
+    fun addErrors(vararg errors: ERROR): SuccessOrMultipleErrors<SUCCESS, ERROR>
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
@@ -25,6 +26,7 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
 
         override fun addError(error: ERROR) = this
         override fun addErrors(errors: Collection<ERROR>) = this
+        override fun addErrors(vararg errors: ERROR) = this
 
         companion object Builder {
 
@@ -46,6 +48,7 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
 
         override fun addError(error: ERROR) = Error<SUCCESS, _>(this.errors.plus(error))
         override fun addErrors(errors: Collection<ERROR>) = Error<SUCCESS, _>(this.errors.plus(errors))
+        override fun addErrors(vararg errors: ERROR) = Error<SUCCESS, _>(this.errors.plus(errors))
 
         companion object Builder {
 

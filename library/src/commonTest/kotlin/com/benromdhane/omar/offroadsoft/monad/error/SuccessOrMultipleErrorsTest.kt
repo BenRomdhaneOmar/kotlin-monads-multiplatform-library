@@ -210,4 +210,36 @@ class SuccessOrMultipleErrorsTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `add errors with varargs must append the errors to the initial errors if success or multiple errors created as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val additionalErrors = listOf(Exception(Uuid.random().toString()))
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .addErrors(*additionalErrors.toTypedArray())
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1 + additionalErrors.size, result.size)
+            assertContains(result, initialError)
+            result.shouldContainAll(additionalErrors)
+        }
+    }
+
+    @Test
+    fun `add error with varargs must be ignored if success or multiple errors created as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .addErrors(*listOf(Exception(Uuid.random().toString())).toTypedArray())
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
 }
