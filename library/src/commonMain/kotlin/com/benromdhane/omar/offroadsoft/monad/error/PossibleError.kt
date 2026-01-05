@@ -13,7 +13,7 @@ sealed interface PossibleError<ERROR : Any> {
 
     @ConsistentCopyVisibility
     data class Error<ERROR : Any> private constructor(
-        val error: ERROR
+        private val error: ERROR
     ) : PossibleError<ERROR> {
 
         override fun error() = true

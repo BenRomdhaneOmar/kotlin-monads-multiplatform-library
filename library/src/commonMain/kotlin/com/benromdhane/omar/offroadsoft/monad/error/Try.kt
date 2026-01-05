@@ -109,12 +109,7 @@ sealed interface Try<SUCCESS : Any> {
 
         companion object Builder {
 
-            fun <SUCCESS : Any> of(
-                success: SUCCESS
-            ): Try<SUCCESS> =
-                Success(
-                    success
-                )
+            fun <SUCCESS : Any> of(success: SUCCESS): Try<SUCCESS> = Success(success)
         }
     }
 
@@ -181,12 +176,7 @@ sealed interface Try<SUCCESS : Any> {
 
         companion object Builder {
 
-            fun <SUCCESS : Any> of(
-                failure: Throwable
-            ): Try<SUCCESS> =
-                Failure(
-                    failure
-                )
+            fun <SUCCESS : Any> of(failure: Throwable): Try<SUCCESS> = Failure(failure)
         }
     }
 }

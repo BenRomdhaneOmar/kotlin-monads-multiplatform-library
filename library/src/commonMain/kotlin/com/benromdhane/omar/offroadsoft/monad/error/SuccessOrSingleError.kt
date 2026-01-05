@@ -50,7 +50,7 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
-        val success: SUCCESS
+        private val success: SUCCESS
     ) : SuccessOrSingleError<SUCCESS, ERROR> {
 
         override fun success() = true
@@ -113,13 +113,14 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
 
         companion object Builder {
 
-            fun <SUCCESS : Any, ERROR : Any> of(success: SUCCESS) = Success<SUCCESS, ERROR>(success)
+            fun <SUCCESS : Any, ERROR : Any> of(success: SUCCESS): SuccessOrSingleError<SUCCESS, ERROR> =
+                Success(success)
         }
     }
 
     @ConsistentCopyVisibility
     data class Error<SUCCESS : Any, ERROR : Any> private constructor(
-        val error: ERROR
+        private val error: ERROR
     ) : SuccessOrSingleError<SUCCESS, ERROR> {
 
         override fun success() = false
@@ -180,7 +181,7 @@ sealed interface SuccessOrSingleError<SUCCESS : Any, ERROR : Any> {
 
         companion object Builder {
 
-            fun <SUCCESS : Any, ERROR : Any> of(error: ERROR) = Error<SUCCESS, ERROR>(error)
+            fun <SUCCESS : Any, ERROR : Any> of(error: ERROR): SuccessOrSingleError<SUCCESS, ERROR> = Error(error)
         }
     }
 }

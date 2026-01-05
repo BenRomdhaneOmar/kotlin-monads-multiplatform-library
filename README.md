@@ -47,6 +47,10 @@
 
 [Success or single error test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/error/SuccessOrSingleErrorTest.kt)
 
+### Success or multiple errors:
+
+[Success or multiple errors test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/error/SuccessOrMultipleErrorsTest.kt)
+
 ## Run tests for all targets:
 
 ```shell
