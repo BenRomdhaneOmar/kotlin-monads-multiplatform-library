@@ -103,4 +103,46 @@ class SuccessOrMultipleErrorsTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `map success must be ignored if success or multiple errors created as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .mapSuccess {
+                    evaluated = true
+                    it.length
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `map success must transform initial value if success or multiple errors created as success`() {
+        val initialValue = Uuid.random().toString()
+        var evaluated = false
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .mapSuccess {
+                    evaluated = true
+                    it.length
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(initialValue.length, result)
+        }
+    }
 }
