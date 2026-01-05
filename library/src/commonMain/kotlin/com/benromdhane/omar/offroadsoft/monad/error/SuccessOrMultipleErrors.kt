@@ -1,9 +1,12 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
+import com.benromdhane.omar.offroadsoft.monad.Maybe
+
 sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
 
     fun error(): Boolean
     fun success() = error().not()
+    fun toMaybeSuccess(): Maybe<SUCCESS>
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
@@ -11,6 +14,7 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
     ) : SuccessOrMultipleErrors<SUCCESS, ERROR> {
 
         override fun error() = false
+        override fun toMaybeSuccess() = Maybe.NotEmpty.of(this.success)
 
         companion object Builder {
 
@@ -25,6 +29,7 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
     ) : SuccessOrMultipleErrors<SUCCESS, ERROR> {
 
         override fun error() = true
+        override fun toMaybeSuccess() = Maybe.Empty.of<SUCCESS>()
 
         companion object Builder {
 
