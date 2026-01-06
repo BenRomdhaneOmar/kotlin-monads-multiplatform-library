@@ -1,5 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
+import com.benromdhane.omar.offroadsoft.monad.Either
 import com.benromdhane.omar.offroadsoft.monad.Maybe
 
 sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
@@ -60,6 +61,8 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
         alternativeSuccess: () -> SUCCESS,
         condition: (ERROR) -> Boolean
     ): SuccessOrMultipleErrors<SUCCESS, ERROR>
+
+    fun toEither(): Either<Collection<ERROR>, SUCCESS>
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
@@ -122,6 +125,7 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
         override fun toSuccessIfAnyError(alternativeSuccess: () -> SUCCESS, condition: (ERROR) -> Boolean) = this
         override fun toSuccessIfNoneOfErrors(alternativeSuccess: SUCCESS, condition: (ERROR) -> Boolean) = this
         override fun toSuccessIfNoneOfErrors(alternativeSuccess: () -> SUCCESS, condition: (ERROR) -> Boolean) = this
+        override fun toEither() = Either.Right.of<Collection<ERROR>, _>(this.success)
 
         companion object Builder {
 
@@ -206,6 +210,8 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
                 this
             else
                 Success.of(alternativeSuccess())
+
+        override fun toEither() = Either.Left.of<Collection<ERROR>, SUCCESS>(this.errors)
 
         companion object Builder {
 

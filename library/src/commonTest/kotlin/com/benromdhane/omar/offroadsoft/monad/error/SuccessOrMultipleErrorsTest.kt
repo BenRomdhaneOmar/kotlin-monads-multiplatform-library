@@ -1218,4 +1218,38 @@ class SuccessOrMultipleErrorsTest {
 
         assertEquals(alternativeSuccess, result)
     }
+
+    @Test
+    fun `to either must return left either with errors if initial success or multiple errors initiated as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val secondError = IllegalArgumentException(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .addError(secondError)
+                .toEither()
+                .toMaybeLeft()
+                .orNull()!!
+
+        assertSoftly {
+            assertEquals(2, result.size)
+            assertContains(result, initialError)
+            assertContains(result, secondError)
+        }
+    }
+
+    @Test
+    fun `to either must return right either with success value if initial success or multiple errors initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .toEither()
+                .toMaybeRight()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
 }
