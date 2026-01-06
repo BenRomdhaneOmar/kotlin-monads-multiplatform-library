@@ -31,6 +31,10 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
 
     fun toSuccess(alternativeSuccess: SUCCESS): SuccessOrMultipleErrors<SUCCESS, ERROR>
     fun toSuccess(alternativeSuccess: () -> SUCCESS): SuccessOrMultipleErrors<SUCCESS, ERROR>
+    fun toSuccessIfAllErrors(
+        alternativeSuccess: SUCCESS,
+        condition: (ERROR) -> Boolean
+    ): SuccessOrMultipleErrors<SUCCESS, ERROR>
 
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
@@ -87,6 +91,7 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
 
         override fun toSuccess(alternativeSuccess: SUCCESS) = this
         override fun toSuccess(alternativeSuccess: () -> SUCCESS) = this
+        override fun toSuccessIfAllErrors(alternativeSuccess: SUCCESS, condition: (ERROR) -> Boolean) = this
 
         companion object Builder {
 
@@ -118,6 +123,14 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
         override fun filterSuccessNot(alternativeError: () -> ERROR, condition: (SUCCESS) -> Boolean) = this
         override fun toSuccess(alternativeSuccess: SUCCESS) = Success.of<_, ERROR>(alternativeSuccess)
         override fun toSuccess(alternativeSuccess: () -> SUCCESS) = Success.of<_, ERROR>(alternativeSuccess())
+        override fun toSuccessIfAllErrors(
+            alternativeSuccess: SUCCESS,
+            condition: (ERROR) -> Boolean
+        ) =
+            if (this.errors.any { condition(it).not() })
+                this
+            else
+                Success.of(alternativeSuccess)
 
         companion object Builder {
 
