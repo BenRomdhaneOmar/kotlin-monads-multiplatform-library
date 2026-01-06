@@ -1252,4 +1252,33 @@ class SuccessOrMultipleErrorsTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `fold must return errors mapper result if initial success or multiple errors initiated as error`() {
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .fold(
+                    { 0 },
+                    { it.size }
+                )
+
+        assertEquals(1, result)
+    }
+
+    @Test
+    fun `fold must return success mapper result if initial success or multiple errors initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .fold(
+                    { it.length },
+                    { it.size }
+                )
+
+        assertEquals(initialValue.length, result)
+    }
 }
