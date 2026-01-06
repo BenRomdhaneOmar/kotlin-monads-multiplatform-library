@@ -882,4 +882,82 @@ class SuccessOrMultipleErrorsTest {
 
         assertEquals(alternativeSuccess, result)
     }
+
+    @Test
+    fun `to success if any errors must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .toSuccessIfAnyErrors(
+                    Uuid.random().toString()
+                ) {
+                    false
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `to success if any errors must return success with initial success if initial success or multiple errors initiated as success and condition is valid for at least one of errors`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .toSuccessIfAnyErrors(
+                    Uuid.random().toString()
+                ) {
+                    true
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `to success if any errors must return error if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
+        val initialError = Exception(Uuid.random().toString())
+        val secondError = IllegalArgumentException(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .addError(secondError)
+                .toSuccessIfAnyErrors(
+                    Uuid.random().toString()
+                ) {
+                    false
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(2, result.size)
+            assertContains(result, initialError)
+            assertContains(result, secondError)
+        }
+    }
+
+    @Test
+    fun `to success if any errors must return success with alternative success if initial success or multiple errors initiated as error and condition is valid for at least one of errors`() {
+        val alternativeSuccess = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .addError(IllegalArgumentException(Uuid.random().toString()))
+                .toSuccessIfAnyErrors(
+                    alternativeSuccess
+                ) {
+                    it is IllegalArgumentException
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(alternativeSuccess, result)
+    }
 }
