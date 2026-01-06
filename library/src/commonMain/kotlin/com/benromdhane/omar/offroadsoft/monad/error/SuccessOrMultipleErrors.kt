@@ -225,3 +225,10 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
         }
     }
 }
+
+fun <SUCCESS : Any, ERROR : Any> SuccessOrMultipleErrors<SUCCESS, ERROR>.asSuccessOrSingleError() =
+    this
+        .fold(
+            { SuccessOrSingleError.Success.of<_, Collection<ERROR>>(it) },
+            { SuccessOrSingleError.Error.of(it) }
+        )

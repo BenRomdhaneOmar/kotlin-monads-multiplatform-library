@@ -1281,4 +1281,35 @@ class SuccessOrMultipleErrorsTest {
 
         assertEquals(initialValue.length, result)
     }
+
+    @Test
+    fun `as success or single error must return error success or single error with errors if initial success or multiple errors initiated as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .asSuccessOrSingleError()
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `as success or single error must return success success or single error with success value if initial success or multiple errors initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .asSuccessOrSingleError()
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
 }
