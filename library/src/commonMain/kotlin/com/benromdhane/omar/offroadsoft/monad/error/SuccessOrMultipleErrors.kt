@@ -232,3 +232,10 @@ fun <SUCCESS : Any, ERROR : Any> SuccessOrMultipleErrors<SUCCESS, ERROR>.asSucce
             { SuccessOrSingleError.Success.of<_, Collection<ERROR>>(it) },
             { SuccessOrSingleError.Error.of(it) }
         )
+
+fun <SUCCESS : Any, ERROR : Any, NEW_SUCCESS : Any> SuccessOrSingleError<SUCCESS, ERROR>.flatMapSuccess(mapper: (SUCCESS) -> SuccessOrMultipleErrors<NEW_SUCCESS, ERROR>) =
+    this
+        .fold(
+            mapper,
+            { SuccessOrMultipleErrors.Error.of(it) }
+        )

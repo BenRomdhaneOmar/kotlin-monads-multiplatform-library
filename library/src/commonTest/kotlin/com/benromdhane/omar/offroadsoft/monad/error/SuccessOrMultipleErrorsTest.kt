@@ -1312,4 +1312,82 @@ class SuccessOrMultipleErrorsTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `success or single error flat map success extension function with success or multiple errors mapping result must return error success or multiple errors with initial error if initial success or single error is error and success or multiple errors mapping result is error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccess<_, _, _> {
+                    SuccessOrMultipleErrors
+                        .Error
+                        .of<Int, _>(Exception(Uuid.random().toString()))
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `success or single error flat map success extension function with success or multiple errors mapping result must return error success or multiple errors with initial error if initial success or single error is error and success or multiple errors mapping result is success`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccess<_, _, _> {
+                    SuccessOrMultipleErrors
+                        .Success
+                        .of(Uuid.random().toString())
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `success or single error flat map success extension function with success or multiple errors mapping result must return error success or multiple errors with mapping result error if initial success or single error is success and success or multiple errors mapping result is error`() {
+        val mappingError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .flatMapSuccess<_, _, _> {
+                    SuccessOrMultipleErrors
+                        .Error
+                        .of<Int, _>(mappingError)
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, mappingError)
+        }
+    }
+
+    @Test
+    fun `success or single error flat map success extension function with success or multiple errors mapping result must return success success or multiple errors with mapping result success if initial success or single error is success and success or multiple errors mapping result is success`() {
+        val mappingValue = Uuid.random().toString()
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .flatMapSuccess<_, _, _> {
+                    SuccessOrMultipleErrors
+                        .Success
+                        .of(mappingValue)
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(mappingValue, result)
+    }
 }
