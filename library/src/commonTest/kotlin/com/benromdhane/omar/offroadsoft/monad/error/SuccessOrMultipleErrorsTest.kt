@@ -658,4 +658,32 @@ class SuccessOrMultipleErrorsTest {
             assertContains(result, alternativeError)
         }
     }
+
+    @Test
+    fun `to success must be ignored if success or multiple errors initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .toSuccess(Uuid.random().toString())
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `to success must return alternative success if success or multiple errors initiated as error`() {
+        val alternativeValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .toSuccess(alternativeValue)
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(alternativeValue, result)
+    }
 }
