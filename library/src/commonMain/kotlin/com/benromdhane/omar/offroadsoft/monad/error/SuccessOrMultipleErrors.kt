@@ -41,13 +41,18 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
         condition: (ERROR) -> Boolean
     ): SuccessOrMultipleErrors<SUCCESS, ERROR>
 
-    fun toSuccessIfAnyErrors(
+    fun toSuccessIfAnyError(
         alternativeSuccess: SUCCESS,
         condition: (ERROR) -> Boolean
     ): SuccessOrMultipleErrors<SUCCESS, ERROR>
 
-    fun toSuccessIfAnyErrors(
+    fun toSuccessIfAnyError(
         alternativeSuccess: () -> SUCCESS,
+        condition: (ERROR) -> Boolean
+    ): SuccessOrMultipleErrors<SUCCESS, ERROR>
+
+    fun toSuccessIfNoneOfErrors(
+        alternativeSuccess: SUCCESS,
         condition: (ERROR) -> Boolean
     ): SuccessOrMultipleErrors<SUCCESS, ERROR>
 
@@ -108,8 +113,9 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
         override fun toSuccess(alternativeSuccess: () -> SUCCESS) = this
         override fun toSuccessIfAllErrors(alternativeSuccess: SUCCESS, condition: (ERROR) -> Boolean) = this
         override fun toSuccessIfAllErrors(alternativeSuccess: () -> SUCCESS, condition: (ERROR) -> Boolean) = this
-        override fun toSuccessIfAnyErrors(alternativeSuccess: SUCCESS, condition: (ERROR) -> Boolean) = this
-        override fun toSuccessIfAnyErrors(alternativeSuccess: () -> SUCCESS, condition: (ERROR) -> Boolean) = this
+        override fun toSuccessIfAnyError(alternativeSuccess: SUCCESS, condition: (ERROR) -> Boolean) = this
+        override fun toSuccessIfAnyError(alternativeSuccess: () -> SUCCESS, condition: (ERROR) -> Boolean) = this
+        override fun toSuccessIfNoneOfErrors(alternativeSuccess: SUCCESS, condition: (ERROR) -> Boolean) = this
 
         companion object Builder {
 
@@ -159,16 +165,16 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
             else
                 Success.of(alternativeSuccess())
 
-        override fun toSuccessIfAnyErrors(
+        override fun toSuccessIfAnyError(
             alternativeSuccess: SUCCESS,
             condition: (ERROR) -> Boolean
         ) =
-            toSuccessIfAnyErrors(
+            toSuccessIfAnyError(
                 { alternativeSuccess },
                 condition
             )
 
-        override fun toSuccessIfAnyErrors(
+        override fun toSuccessIfAnyError(
             alternativeSuccess: () -> SUCCESS,
             condition: (ERROR) -> Boolean
         ) =
@@ -176,6 +182,15 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
                 Success.of(alternativeSuccess())
             else
                 this
+
+        override fun toSuccessIfNoneOfErrors(
+            alternativeSuccess: SUCCESS,
+            condition: (ERROR) -> Boolean
+        ) =
+            if (this.errors.any(condition))
+                this
+            else
+                Success.of(alternativeSuccess)
 
         companion object Builder {
 

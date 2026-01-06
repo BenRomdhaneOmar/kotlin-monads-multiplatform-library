@@ -862,7 +862,7 @@ class SuccessOrMultipleErrorsTest {
     }
 
     @Test
-    fun `to success if all errors with alternative success provider must return success with alternative success if initial success or multiple errors initiated as error and condition is valid for all errors`() {
+    fun `to success if all error with alternative success provider must return success with alternative success if initial success or multiple errors initiated as error and condition is valid for all errors`() {
         val alternativeSuccess = Uuid.random().toString()
         val result =
             SuccessOrMultipleErrors
@@ -884,13 +884,13 @@ class SuccessOrMultipleErrorsTest {
     }
 
     @Test
-    fun `to success if any errors must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
+    fun `to success if any error must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
         val initialValue = Uuid.random().toString()
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
-                .toSuccessIfAnyErrors(
+                .toSuccessIfAnyError(
                     Uuid.random().toString()
                 ) {
                     false
@@ -902,13 +902,13 @@ class SuccessOrMultipleErrorsTest {
     }
 
     @Test
-    fun `to success if any errors must return success with initial success if initial success or multiple errors initiated as success and condition is valid for at least one of errors`() {
+    fun `to success if any error must return success with initial success if initial success or multiple errors initiated as success and condition is valid for at least one of errors`() {
         val initialValue = Uuid.random().toString()
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
-                .toSuccessIfAnyErrors(
+                .toSuccessIfAnyError(
                     Uuid.random().toString()
                 ) {
                     true
@@ -920,7 +920,7 @@ class SuccessOrMultipleErrorsTest {
     }
 
     @Test
-    fun `to success if any errors must return error if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
+    fun `to success if any error must return error if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
         val initialError = Exception(Uuid.random().toString())
         val secondError = IllegalArgumentException(Uuid.random().toString())
         val result =
@@ -928,7 +928,7 @@ class SuccessOrMultipleErrorsTest {
                 .Error
                 .of<String, _>(initialError)
                 .addError(secondError)
-                .toSuccessIfAnyErrors(
+                .toSuccessIfAnyError(
                     Uuid.random().toString()
                 ) {
                     false
@@ -943,14 +943,14 @@ class SuccessOrMultipleErrorsTest {
     }
 
     @Test
-    fun `to success if any errors must return success with alternative success if initial success or multiple errors initiated as error and condition is valid for at least one of errors`() {
+    fun `to success if any error must return success with alternative success if initial success or multiple errors initiated as error and condition is valid for at least one of errors`() {
         val alternativeSuccess = Uuid.random().toString()
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(Exception(Uuid.random().toString()))
                 .addError(IllegalArgumentException(Uuid.random().toString()))
-                .toSuccessIfAnyErrors(
+                .toSuccessIfAnyError(
                     alternativeSuccess
                 ) {
                     it is IllegalArgumentException
@@ -962,13 +962,13 @@ class SuccessOrMultipleErrorsTest {
     }
 
     @Test
-    fun `to success if any errors with success alternative provider must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
+    fun `to success if any error with success alternative provider must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
         val initialValue = Uuid.random().toString()
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
-                .toSuccessIfAnyErrors(
+                .toSuccessIfAnyError(
                     {
                         Uuid.random().toString()
                     },
@@ -983,13 +983,13 @@ class SuccessOrMultipleErrorsTest {
     }
 
     @Test
-    fun `to success if any errors with success alternative provider must return success with initial success if initial success or multiple errors initiated as success and condition is valid for at least one of errors`() {
+    fun `to success if any error with success alternative provider must return success with initial success if initial success or multiple errors initiated as success and condition is valid for at least one of errors`() {
         val initialValue = Uuid.random().toString()
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
-                .toSuccessIfAnyErrors(
+                .toSuccessIfAnyError(
                     {
                         Uuid.random().toString()
                     },
@@ -1004,7 +1004,7 @@ class SuccessOrMultipleErrorsTest {
     }
 
     @Test
-    fun `to success if any errors with success alternative provider must return error if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
+    fun `to success if any error with success alternative provider must return error if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
         val initialError = Exception(Uuid.random().toString())
         val secondError = IllegalArgumentException(Uuid.random().toString())
         val result =
@@ -1012,7 +1012,7 @@ class SuccessOrMultipleErrorsTest {
                 .Error
                 .of<String, _>(initialError)
                 .addError(secondError)
-                .toSuccessIfAnyErrors(
+                .toSuccessIfAnyError(
                     {
                         Uuid.random().toString()
                     },
@@ -1030,14 +1030,14 @@ class SuccessOrMultipleErrorsTest {
     }
 
     @Test
-    fun `to success if any errors with success alternative provider must return success with alternative success if initial success or multiple errors initiated as error and condition is valid for at least one of errors`() {
+    fun `to success if any error with success alternative provider must return success with alternative success if initial success or multiple errors initiated as error and condition is valid for at least one of errors`() {
         val alternativeSuccess = Uuid.random().toString()
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(Exception(Uuid.random().toString()))
                 .addError(IllegalArgumentException(Uuid.random().toString()))
-                .toSuccessIfAnyErrors(
+                .toSuccessIfAnyError(
                     {
                         alternativeSuccess
                     },
@@ -1045,6 +1045,84 @@ class SuccessOrMultipleErrorsTest {
                         it is IllegalArgumentException
                     }
                 )
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(alternativeSuccess, result)
+    }
+
+    @Test
+    fun `to success if none of errors must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .toSuccessIfNoneOfErrors(
+                    Uuid.random().toString()
+                ) {
+                    false
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `to success if none of errors must return success with initial success if initial success or multiple errors initiated as success and condition is valid for at least one of errors`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .toSuccessIfNoneOfErrors(
+                    Uuid.random().toString()
+                ) {
+                    true
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `to success if none of errors must return error if initial success or multiple errors initiated as error and condition is not valid for at least one of errors`() {
+        val initialError = Exception(Uuid.random().toString())
+        val secondError = IllegalArgumentException(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .addError(secondError)
+                .toSuccessIfNoneOfErrors(
+                    Uuid.random().toString()
+                ) {
+                    it is IllegalArgumentException
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(2, result.size)
+            assertContains(result, initialError)
+            assertContains(result, secondError)
+        }
+    }
+
+    @Test
+    fun `to success if none of errors must return success with alternative success if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
+        val alternativeSuccess = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .addError(Exception(Uuid.random().toString()))
+                .toSuccessIfNoneOfErrors(
+                    alternativeSuccess
+                ) {
+                    false
+                }
                 .toMaybeSuccess()
                 .orNull()!!
 
