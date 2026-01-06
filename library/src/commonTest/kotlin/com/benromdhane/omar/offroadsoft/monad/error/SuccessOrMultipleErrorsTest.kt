@@ -489,4 +489,83 @@ class SuccessOrMultipleErrorsTest {
             assertContains(result, alternativeError)
         }
     }
+
+    @Test
+    fun `filter success not must return initial errors if success or multiple errors initiated as error and filter is valid`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .filterSuccessNot(
+                    Exception(Uuid.random().toString())
+                ) {
+                    true
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `filter success not must return initial errors if success or multiple errors initiated as error and filter is not valid`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .filterSuccessNot(
+                    Exception(Uuid.random().toString())
+                ) {
+                    false
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `filter success not must return success if success or multiple errors initiated as success and filter is not valid`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .filterSuccessNot(
+                    Exception(Uuid.random().toString())
+                )
+                {
+                    false
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `filter success not must return alternative error if success or multiple errors initiated as success and filter is valid`() {
+        val alternativeError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .filterSuccessNot(
+                    alternativeError
+                ) {
+                    true
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, alternativeError)
+        }
+    }
 }
