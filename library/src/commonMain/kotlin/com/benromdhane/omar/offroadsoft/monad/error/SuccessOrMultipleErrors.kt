@@ -46,6 +46,11 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
         condition: (ERROR) -> Boolean
     ): SuccessOrMultipleErrors<SUCCESS, ERROR>
 
+    fun toSuccessIfAnyErrors(
+        alternativeSuccess: () -> SUCCESS,
+        condition: (ERROR) -> Boolean
+    ): SuccessOrMultipleErrors<SUCCESS, ERROR>
+
     @ConsistentCopyVisibility
     data class Success<SUCCESS : Any, ERROR : Any> private constructor(
         private val success: SUCCESS
@@ -104,6 +109,7 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
         override fun toSuccessIfAllErrors(alternativeSuccess: SUCCESS, condition: (ERROR) -> Boolean) = this
         override fun toSuccessIfAllErrors(alternativeSuccess: () -> SUCCESS, condition: (ERROR) -> Boolean) = this
         override fun toSuccessIfAnyErrors(alternativeSuccess: SUCCESS, condition: (ERROR) -> Boolean) = this
+        override fun toSuccessIfAnyErrors(alternativeSuccess: () -> SUCCESS, condition: (ERROR) -> Boolean) = this
 
         companion object Builder {
 
@@ -157,8 +163,17 @@ sealed interface SuccessOrMultipleErrors<SUCCESS : Any, ERROR : Any> {
             alternativeSuccess: SUCCESS,
             condition: (ERROR) -> Boolean
         ) =
+            toSuccessIfAnyErrors(
+                { alternativeSuccess },
+                condition
+            )
+
+        override fun toSuccessIfAnyErrors(
+            alternativeSuccess: () -> SUCCESS,
+            condition: (ERROR) -> Boolean
+        ) =
             if (this.errors.any(condition))
-                Success.of(alternativeSuccess)
+                Success.of(alternativeSuccess())
             else
                 this
 
