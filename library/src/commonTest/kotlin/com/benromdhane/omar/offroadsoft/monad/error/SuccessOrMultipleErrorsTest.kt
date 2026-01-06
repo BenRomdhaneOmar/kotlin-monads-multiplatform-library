@@ -242,4 +242,82 @@ class SuccessOrMultipleErrorsTest {
 
         assertEquals(initialValue, result)
     }
+
+    @Test
+    fun `flat map success must return initial errors if success or multiple errors initiated as error and mapping result is error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccess {
+                    SuccessOrMultipleErrors
+                        .Error
+                        .of(Exception(Uuid.random().toString()))
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `flat map success must return initial errors if success or multiple errors initiated as error and mapping result is success`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccess {
+                    SuccessOrMultipleErrors
+                        .Success
+                        .of(Uuid.random().toString())
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `flat map success must return mapping errors if success or multiple errors initiated as success and mapping result is error`() {
+        val mappingError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .flatMapSuccess {
+                    SuccessOrMultipleErrors
+                        .Error
+                        .of<String, _>(mappingError)
+                }
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, mappingError)
+        }
+    }
+
+    @Test
+    fun `flat map success must return mapped success if success or multiple errors initiated as success and mapping result is success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .flatMapSuccess {
+                    SuccessOrMultipleErrors
+                        .Success
+                        .of(it.length)
+                }
+                .toMaybeSuccess()
+                .orNull()!!
+
+        assertEquals(initialValue.length, result)
+    }
 }
