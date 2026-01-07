@@ -3,7 +3,6 @@ package com.benromdhane.omar.offroadsoft.monad.error
 import com.benromdhane.omar.offroadsoft.monad.Either
 import com.benromdhane.omar.offroadsoft.monad.Maybe
 import com.benromdhane.omar.offroadsoft.monad.error.PossibleError.Success
-import kotlin.jvm.JvmName
 
 sealed interface PossibleError<ERROR : Any> {
 
@@ -47,21 +46,19 @@ sealed interface PossibleError<ERROR : Any> {
     }
 }
 
-fun Try<Unit>.asPossibleError() =
+fun <SUCCESS : Any> Try<SUCCESS>.asPossibleError() =
     this
         .toMaybeFailure()
         .map { PossibleError.Error.of(it) }
         .or { Success.of() }
 
-@JvmName("eitherLeftErrorAsPossibleError")
-fun <ERROR : Any> Either<ERROR, Unit>.asPossibleError() =
+fun <ERROR : Any, SUCCESS : Any> Either<ERROR, SUCCESS>.leftAsPossibleError() =
     this
         .toMaybeLeft()
         .map { PossibleError.Error.of(it) }
         .or { Success.of() }
 
-@JvmName("eitherRightErrorAsPossibleError")
-fun <ERROR : Any> Either<Unit, ERROR>.asPossibleError() =
+fun <ERROR : Any, SUCCESS : Any> Either<SUCCESS, ERROR>.rightAsPossibleError() =
     this
         .toMaybeRight()
         .map { PossibleError.Error.of(it) }
@@ -71,3 +68,7 @@ fun <ERROR : Any> Maybe<ERROR>.asPossibleError() =
     this
         .map { PossibleError.Error.of(it) }
         .or { Success.of() }
+
+fun <ERROR : Any> PossibleError<ERROR>.toFilteredMaybeError(condition: (ERROR) -> Boolean) =
+    this.toMaybeError()
+        .filter(condition)
