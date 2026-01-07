@@ -236,6 +236,15 @@ fun <SUCCESS : Any, ERROR : Any> SuccessOrMultipleErrors<SUCCESS, ERROR>.asSucce
 fun <SUCCESS : Any, ERROR : Any, NEW_SUCCESS : Any> SuccessOrSingleError<SUCCESS, ERROR>.flatMapSuccess(mapper: (SUCCESS) -> SuccessOrMultipleErrors<NEW_SUCCESS, ERROR>) =
     this
         .fold(
-            mapper,
-            { SuccessOrMultipleErrors.Error.of(it) }
-        )
+            mapper
+        ) {
+            SuccessOrMultipleErrors.Error.of(it)
+        }
+
+fun <SUCCESS : Any, ERROR : Any, NEW_SUCCESS : Any> SuccessOrMultipleErrors<SUCCESS, ERROR>.flatMapSuccess(mapper: (SUCCESS) -> SuccessOrSingleError<NEW_SUCCESS, Collection<ERROR>>) =
+    this
+        .fold(
+            mapper
+        ) {
+            SuccessOrSingleError.Error.of(it)
+        }
