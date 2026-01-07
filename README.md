@@ -51,9 +51,9 @@
 
 [Success or multiple errors test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/error/SuccessOrMultipleErrorsTest.kt)
 
-## Run tests for all targets:
+## Dependencies:
 
-https://central.sonatype.com/search?q=kotlin-monads-multiplatform-library&namespace=io.github.benromdhaneomar
+[Maven central dependencies](https://central.sonatype.com/search?q=kotlin-monads-multiplatform-library&namespace=io.github.benromdhaneomar)
 
 ## Run tests for all targets:
 
