@@ -247,11 +247,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `flat map success must return initial errors if success or multiple errors initiated as error and mapping result is error`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(initialError)
                 .flatMapSuccess {
+                    evaluated = true
                     SuccessOrMultipleErrors
                         .Error
                         .of(Exception(Uuid.random().toString()))
@@ -259,6 +261,7 @@ class SuccessOrMultipleErrorsTest {
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -267,11 +270,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `flat map success must return initial errors if success or multiple errors initiated as error and mapping result is success`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(initialError)
                 .flatMapSuccess {
+                    evaluated = false
                     SuccessOrMultipleErrors
                         .Success
                         .of(Uuid.random().toString())
@@ -279,6 +284,7 @@ class SuccessOrMultipleErrorsTest {
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -287,11 +293,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `flat map success must return mapping errors if success or multiple errors initiated as success and mapping result is error`() {
         val mappingError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(Uuid.random().toString())
                 .flatMapSuccess {
+                    evaluated = true
                     SuccessOrMultipleErrors
                         .Error
                         .of<String, _>(mappingError)
@@ -299,6 +307,7 @@ class SuccessOrMultipleErrorsTest {
                 .toErrors()
 
         assertSoftly {
+            assertTrue { evaluated }
             assertEquals(1, result.size)
             assertContains(result, mappingError)
         }
@@ -307,11 +316,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `flat map success must return mapped success if success or multiple errors initiated as success and mapping result is success`() {
         val initialValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
                 .flatMapSuccess {
+                    evaluated = true
                     SuccessOrMultipleErrors
                         .Success
                         .of(it.length)
@@ -319,12 +330,16 @@ class SuccessOrMultipleErrorsTest {
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue.length, result)
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(initialValue.length, result)
+        }
     }
 
     @Test
     fun `filter success must return initial errors if success or multiple errors initiated as error and filter is not valid`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -332,11 +347,13 @@ class SuccessOrMultipleErrorsTest {
                 .filterSuccess(
                     Exception(Uuid.random().toString())
                 ) {
+                    evaluated = true
                     false
                 }
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -345,6 +362,7 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `filter success must return initial errors if success or multiple errors initiated as error and filter is valid`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -352,11 +370,13 @@ class SuccessOrMultipleErrorsTest {
                 .filterSuccess(
                     Exception(Uuid.random().toString())
                 ) {
+                    evaluated = true
                     true
                 }
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -365,6 +385,7 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `filter success must return success if success or multiple errors initiated as success and filter is valid`() {
         val initialValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
@@ -373,17 +394,22 @@ class SuccessOrMultipleErrorsTest {
                     Exception(Uuid.random().toString())
                 )
                 {
+                    evaluated = true
                     true
                 }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `filter success must return alternative error if success or multiple errors initiated as success and filter is not valid`() {
         val alternativeError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
@@ -391,11 +417,13 @@ class SuccessOrMultipleErrorsTest {
                 .filterSuccess(
                     alternativeError
                 ) {
+                    evaluated = true
                     false
                 }
                 .toErrors()
 
         assertSoftly {
+            assertTrue { evaluated }
             assertEquals(1, result.size)
             assertContains(result, alternativeError)
         }
@@ -404,21 +432,27 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `filter success with alternative error provider must return initial errors if success or multiple errors initiated as error and filter is not valid`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(initialError)
                 .filterSuccess(
                     {
+                        evaluatedAlternative = true
                         Exception(Uuid.random().toString())
                     },
                     {
+                        evaluatedCondition = true
                         false
                     }
                 )
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertFalse { evaluatedCondition }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -427,21 +461,27 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `filter success with alternative error provider must return initial errors if success or multiple errors initiated as error and filter is valid`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(initialError)
                 .filterSuccess(
                     {
+                        evaluatedAlternative = true
                         Exception(Uuid.random().toString())
                     },
                     {
+                        evaluatedCondition = true
                         true
                     }
                 )
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertFalse { evaluatedCondition }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -450,42 +490,56 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `filter success with alternative error provider must return success if success or multiple errors initiated as success and filter is valid`() {
         val initialValue = Uuid.random().toString()
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
                 .filterSuccess(
                     {
+                        evaluatedAlternative = true
                         Exception(Uuid.random().toString())
                     },
                     {
+                        evaluatedCondition = true
                         true
                     }
                 )
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertTrue { evaluatedCondition }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `filter success with alternative error provider must return alternative error if success or multiple errors initiated as success and filter is not valid`() {
         val alternativeError = Exception(Uuid.random().toString())
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(Uuid.random().toString())
                 .filterSuccess(
                     {
+                        evaluatedAlternative = true
                         alternativeError
                     },
                     {
+                        evaluatedCondition = true
                         false
                     }
                 )
                 .toErrors()
 
         assertSoftly {
+            assertTrue { evaluatedAlternative }
+            assertTrue { evaluatedCondition }
             assertEquals(1, result.size)
             assertContains(result, alternativeError)
         }
@@ -494,6 +548,7 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `filter success not must return initial errors if success or multiple errors initiated as error and filter is valid`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -501,11 +556,13 @@ class SuccessOrMultipleErrorsTest {
                 .filterSuccessNot(
                     Exception(Uuid.random().toString())
                 ) {
+                    evaluated = true
                     true
                 }
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -514,6 +571,7 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `filter success not must return initial errors if success or multiple errors initiated as error and filter is not valid`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -521,11 +579,13 @@ class SuccessOrMultipleErrorsTest {
                 .filterSuccessNot(
                     Exception(Uuid.random().toString())
                 ) {
+                    evaluated = true
                     false
                 }
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -534,6 +594,7 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `filter success not must return success if success or multiple errors initiated as success and filter is not valid`() {
         val initialValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
@@ -542,17 +603,22 @@ class SuccessOrMultipleErrorsTest {
                     Exception(Uuid.random().toString())
                 )
                 {
+                    evaluated = true
                     false
                 }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `filter success not must return alternative error if success or multiple errors initiated as success and filter is valid`() {
         val alternativeError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
@@ -560,11 +626,13 @@ class SuccessOrMultipleErrorsTest {
                 .filterSuccessNot(
                     alternativeError
                 ) {
+                    evaluated = true
                     true
                 }
                 .toErrors()
 
         assertSoftly {
+            assertTrue { evaluated }
             assertEquals(1, result.size)
             assertContains(result, alternativeError)
         }
@@ -573,21 +641,27 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `filter success not with alternative error provider must return initial errors if success or multiple errors initiated as error and filter is valid`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(initialError)
                 .filterSuccessNot(
                     {
+                        evaluatedAlternative = true
                         Exception(Uuid.random().toString())
                     },
                     {
+                        evaluatedCondition = true
                         true
                     }
                 )
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertFalse { evaluatedCondition }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -596,21 +670,27 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `filter success not with alternative error provider must return initial errors if success or multiple errors initiated as error and filter is not valid`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(initialError)
                 .filterSuccessNot(
                     {
+                        evaluatedAlternative = true
                         Exception(Uuid.random().toString())
                     },
                     {
+                        evaluatedCondition = true
                         false
                     }
                 )
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertFalse { evaluatedCondition }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -619,42 +699,56 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `filter success not with alternative error provider must return success if success or multiple errors initiated as success and filter is not valid`() {
         val initialValue = Uuid.random().toString()
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
                 .filterSuccessNot(
                     {
+                        evaluatedAlternative = true
                         Exception(Uuid.random().toString())
                     },
                     {
+                        evaluatedCondition = true
                         false
                     }
                 )
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertTrue { evaluatedCondition }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `filter success not with alternative error provider must return alternative error if success or multiple errors initiated as success and filter is valid`() {
         val alternativeError = Exception(Uuid.random().toString())
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(Uuid.random().toString())
                 .filterSuccessNot(
                     {
+                        evaluatedAlternative = true
                         alternativeError
                     },
                     {
+                        evaluatedCondition = true
                         true
                     }
                 )
                 .toErrors()
 
         assertSoftly {
+            assertTrue { evaluatedAlternative }
+            assertTrue { evaluatedCondition }
             assertEquals(1, result.size)
             assertContains(result, alternativeError)
         }
@@ -691,34 +785,49 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `to success with provider must be ignored if success or multiple errors initiated as success`() {
         val initialValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
-                .toSuccess { Uuid.random().toString() }
+                .toSuccess {
+                    evaluated = true
+                    Uuid.random().toString()
+                }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success with provider must return alternative success if success or multiple errors initiated as error`() {
         val alternativeValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(Exception(Uuid.random().toString()))
-                .toSuccess { alternativeValue }
+                .toSuccess {
+                    evaluated = true
+                    alternativeValue
+                }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(alternativeValue, result)
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeValue, result)
+        }
     }
 
     @Test
     fun `to success if all errors must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
@@ -726,17 +835,22 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfAllErrors(
                     Uuid.random().toString()
                 ) {
+                    evaluated = true
                     false
                 }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if all errors must return success with initial success if initial success or multiple errors initiated as success and condition is valid for all errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
@@ -744,18 +858,23 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfAllErrors(
                     Uuid.random().toString()
                 ) {
+                    evaluated = true
                     true
                 }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if all errors must return error if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
         val initialError = Exception(Uuid.random().toString())
         val secondError = IllegalArgumentException(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -764,11 +883,13 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfAllErrors(
                     Uuid.random().toString()
                 ) {
+                    evaluated = true
                     it is IllegalArgumentException
                 }
                 .toErrors()
 
         assertSoftly {
+            assertTrue { evaluated }
             assertEquals(2, result.size)
             assertContains(result, initialError)
             assertContains(result, secondError)
@@ -778,6 +899,7 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `to success if all errors must return success with alternative success if initial success or multiple errors initiated as error and condition is valid for all errors`() {
         val alternativeSuccess = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -786,60 +908,82 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfAllErrors(
                     alternativeSuccess
                 ) {
+                    evaluated = true
                     true
                 }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(alternativeSuccess, result)
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeSuccess, result)
+        }
     }
 
     @Test
     fun `to success if all errors with alternative success provider must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
                 .toSuccessIfAllErrors(
                     {
+                        evaluatedAlternative = true
                         Uuid.random().toString()
                     },
                     {
+                        evaluatedCondition = true
                         false
                     }
                 )
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertFalse { evaluatedCondition }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if all errors with alternative success provider must return success with initial success if initial success or multiple errors initiated as success and condition is valid for all errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
                 .toSuccessIfAllErrors(
                     {
+                        evaluatedAlternative = true
                         Uuid.random().toString()
                     },
                     {
+                        evaluatedCondition = true
                         true
                     }
                 )
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertFalse { evaluatedCondition }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if all errors with alternative success provider must return error if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
         val initialError = Exception(Uuid.random().toString())
         val secondError = IllegalArgumentException(Uuid.random().toString())
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -847,15 +991,19 @@ class SuccessOrMultipleErrorsTest {
                 .addError(secondError)
                 .toSuccessIfAllErrors(
                     {
+                        evaluatedAlternative = true
                         Uuid.random().toString()
                     },
                     {
+                        evaluatedCondition = true
                         it is IllegalArgumentException
                     }
                 )
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertTrue { evaluatedCondition }
             assertEquals(2, result.size)
             assertContains(result, initialError)
             assertContains(result, secondError)
@@ -865,6 +1013,8 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `to success if all error with alternative success provider must return success with alternative success if initial success or multiple errors initiated as error and condition is valid for all errors`() {
         val alternativeSuccess = Uuid.random().toString()
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -872,21 +1022,28 @@ class SuccessOrMultipleErrorsTest {
                 .addError(Exception(Uuid.random().toString()))
                 .toSuccessIfAllErrors(
                     {
+                        evaluatedAlternative = true
                         alternativeSuccess
                     },
                     {
+                        evaluatedCondition = true
                         true
                     }
                 )
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(alternativeSuccess, result)
+        assertSoftly {
+            assertTrue { evaluatedAlternative }
+            assertTrue { evaluatedCondition }
+            assertEquals(alternativeSuccess, result)
+        }
     }
 
     @Test
     fun `to success if any error must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
@@ -894,17 +1051,22 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfAnyError(
                     Uuid.random().toString()
                 ) {
+                    evaluated = true
                     false
                 }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if any error must return success with initial success if initial success or multiple errors initiated as success and condition is valid for at least one of errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
@@ -912,18 +1074,23 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfAnyError(
                     Uuid.random().toString()
                 ) {
+                    evaluated = true
                     true
                 }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if any error must return error if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
         val initialError = Exception(Uuid.random().toString())
         val secondError = IllegalArgumentException(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -932,11 +1099,13 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfAnyError(
                     Uuid.random().toString()
                 ) {
+                    evaluated = true
                     false
                 }
                 .toErrors()
 
         assertSoftly {
+            assertTrue { evaluated }
             assertEquals(2, result.size)
             assertContains(result, initialError)
             assertContains(result, secondError)
@@ -946,6 +1115,7 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `to success if any error must return success with alternative success if initial success or multiple errors initiated as error and condition is valid for at least one of errors`() {
         val alternativeSuccess = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -954,60 +1124,82 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfAnyError(
                     alternativeSuccess
                 ) {
+                    evaluated = true
                     it is IllegalArgumentException
                 }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(alternativeSuccess, result)
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeSuccess, result)
+        }
     }
 
     @Test
     fun `to success if any error with success alternative provider must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
                 .toSuccessIfAnyError(
                     {
+                        evaluatedAlternative = true
                         Uuid.random().toString()
                     },
                     {
+                        evaluatedCondition = true
                         false
                     }
                 )
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertFalse { evaluatedCondition }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if any error with success alternative provider must return success with initial success if initial success or multiple errors initiated as success and condition is valid for at least one of errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
                 .toSuccessIfAnyError(
                     {
+                        evaluatedAlternative = true
                         Uuid.random().toString()
                     },
                     {
+                        evaluatedCondition = true
                         true
                     }
                 )
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertFalse { evaluatedCondition }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if any error with success alternative provider must return error if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
         val initialError = Exception(Uuid.random().toString())
         val secondError = IllegalArgumentException(Uuid.random().toString())
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -1015,15 +1207,19 @@ class SuccessOrMultipleErrorsTest {
                 .addError(secondError)
                 .toSuccessIfAnyError(
                     {
+                        evaluatedAlternative = true
                         Uuid.random().toString()
                     },
                     {
+                        evaluatedCondition = true
                         false
                     }
                 )
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertTrue { evaluatedCondition }
             assertEquals(2, result.size)
             assertContains(result, initialError)
             assertContains(result, secondError)
@@ -1033,6 +1229,8 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `to success if any error with success alternative provider must return success with alternative success if initial success or multiple errors initiated as error and condition is valid for at least one of errors`() {
         val alternativeSuccess = Uuid.random().toString()
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -1040,21 +1238,28 @@ class SuccessOrMultipleErrorsTest {
                 .addError(IllegalArgumentException(Uuid.random().toString()))
                 .toSuccessIfAnyError(
                     {
+                        evaluatedAlternative = true
                         alternativeSuccess
                     },
                     {
+                        evaluatedCondition = true
                         it is IllegalArgumentException
                     }
                 )
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(alternativeSuccess, result)
+        assertSoftly {
+            assertTrue { evaluatedAlternative }
+            assertTrue { evaluatedCondition }
+            assertEquals(alternativeSuccess, result)
+        }
     }
 
     @Test
     fun `to success if none of errors must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
@@ -1062,17 +1267,22 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfNoneOfErrors(
                     Uuid.random().toString()
                 ) {
+                    evaluated = true
                     false
                 }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if none of errors must return success with initial success if initial success or multiple errors initiated as success and condition is valid for at least one of errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
@@ -1080,18 +1290,23 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfNoneOfErrors(
                     Uuid.random().toString()
                 ) {
+                    evaluated = true
                     true
                 }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluated }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if none of errors must return error if initial success or multiple errors initiated as error and condition is not valid for at least one of errors`() {
         val initialError = Exception(Uuid.random().toString())
         val secondError = IllegalArgumentException(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -1100,11 +1315,13 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfNoneOfErrors(
                     Uuid.random().toString()
                 ) {
+                    evaluated = true
                     it is IllegalArgumentException
                 }
                 .toErrors()
 
         assertSoftly {
+            assertTrue { evaluated }
             assertEquals(2, result.size)
             assertContains(result, initialError)
             assertContains(result, secondError)
@@ -1114,6 +1331,7 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `to success if none of errors must return success with alternative success if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
         val alternativeSuccess = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -1122,60 +1340,82 @@ class SuccessOrMultipleErrorsTest {
                 .toSuccessIfNoneOfErrors(
                     alternativeSuccess
                 ) {
+                    evaluated = true
                     false
                 }
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(alternativeSuccess, result)
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(alternativeSuccess, result)
+        }
     }
 
     @Test
     fun `to success if none of errors with success alternative provider must return success with initial success if initial success or multiple errors initiated as success and condition is not valid for all errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
                 .toSuccessIfNoneOfErrors(
                     {
+                        evaluatedAlternative = true
                         Uuid.random().toString()
                     },
                     {
+                        evaluatedCondition = true
                         false
                     }
                 )
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertFalse { evaluatedCondition }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if none of errors with success alternative provider must return success with initial success if initial success or multiple errors initiated as success and condition is valid for at least one of errors`() {
         val initialValue = Uuid.random().toString()
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
                 .toSuccessIfNoneOfErrors(
                     {
+                        evaluatedAlternative = true
                         Uuid.random().toString()
                     },
                     {
+                        evaluatedCondition = true
                         true
                     }
                 )
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(initialValue, result)
+        assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertFalse { evaluatedCondition }
+            assertEquals(initialValue, result)
+        }
     }
 
     @Test
     fun `to success if none of errors with success alternative provider must return error if initial success or multiple errors initiated as error and condition is not valid for at least one of errors`() {
         val initialError = Exception(Uuid.random().toString())
         val secondError = IllegalArgumentException(Uuid.random().toString())
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -1183,15 +1423,19 @@ class SuccessOrMultipleErrorsTest {
                 .addError(secondError)
                 .toSuccessIfNoneOfErrors(
                     {
+                        evaluatedAlternative = true
                         Uuid.random().toString()
                     },
                     {
+                        evaluatedCondition = true
                         it is IllegalArgumentException
                     }
                 )
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluatedAlternative }
+            assertTrue { evaluatedCondition }
             assertEquals(2, result.size)
             assertContains(result, initialError)
             assertContains(result, secondError)
@@ -1201,6 +1445,8 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `to success if none of errors with success alternative provider must return success with alternative success if initial success or multiple errors initiated as error and condition is not valid for all errors`() {
         val alternativeSuccess = Uuid.random().toString()
+        var evaluatedAlternative = false
+        var evaluatedCondition = false
         val result =
             SuccessOrMultipleErrors
                 .Error
@@ -1208,16 +1454,22 @@ class SuccessOrMultipleErrorsTest {
                 .addError(Exception(Uuid.random().toString()))
                 .toSuccessIfNoneOfErrors(
                     {
+                        evaluatedAlternative = true
                         alternativeSuccess
                     },
                     {
+                        evaluatedCondition = true
                         false
                     }
                 )
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(alternativeSuccess, result)
+        assertSoftly {
+            assertTrue { evaluatedAlternative }
+            assertTrue { evaluatedCondition }
+            assertEquals(alternativeSuccess, result)
+        }
     }
 
     @Test
@@ -1256,31 +1508,55 @@ class SuccessOrMultipleErrorsTest {
 
     @Test
     fun `fold must return errors mapper result if initial success or multiple errors initiated as error`() {
+        var evaluatedSuccessMapper = false
+        var evaluatedErrorMapper = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(Exception(Uuid.random().toString()))
                 .fold(
-                    { 0 },
-                    { it.size }
+                    {
+                        evaluatedSuccessMapper = true
+                        0
+                    },
+                    {
+                        evaluatedErrorMapper = true
+                        it.size
+                    }
                 )
 
-        assertEquals(1, result)
+        assertSoftly {
+            assertTrue { evaluatedErrorMapper }
+            assertFalse { evaluatedSuccessMapper }
+            assertEquals(1, result)
+        }
     }
 
     @Test
     fun `fold must return success mapper result if initial success or multiple errors initiated as success`() {
         val initialValue = Uuid.random().toString()
+        var evaluatedSuccessMapper = false
+        var evaluatedErrorMapper = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(initialValue)
                 .fold(
-                    { it.length },
-                    { it.size }
+                    {
+                        evaluatedSuccessMapper = true
+                        it.length
+                    },
+                    {
+                        evaluatedErrorMapper = true
+                        it.size
+                    }
                 )
 
-        assertEquals(initialValue.length, result)
+        assertSoftly {
+            assertFalse { evaluatedErrorMapper }
+            assertTrue { evaluatedSuccessMapper }
+            assertEquals(initialValue.length, result)
+        }
     }
 
     @Test
@@ -1317,11 +1593,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `success or single error flat map success extension function with success or multiple errors mapping result must return error success or multiple errors with initial error if initial success or single error is error and success or multiple errors mapping result is error`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrSingleError
                 .Error
                 .of<String, _>(initialError)
                 .flatMapSuccess<_, _, _> {
+                    evaluated = true
                     SuccessOrMultipleErrors
                         .Error
                         .of<Int, _>(Exception(Uuid.random().toString()))
@@ -1329,6 +1607,7 @@ class SuccessOrMultipleErrorsTest {
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -1337,11 +1616,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `success or single error flat map success extension function with success or multiple errors mapping result must return error success or multiple errors with initial error if initial success or single error is error and success or multiple errors mapping result is success`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrSingleError
                 .Error
                 .of<String, _>(initialError)
                 .flatMapSuccess<_, _, _> {
+                    evaluated = true
                     SuccessOrMultipleErrors
                         .Success
                         .of(Uuid.random().toString())
@@ -1349,6 +1630,7 @@ class SuccessOrMultipleErrorsTest {
                 .toErrors()
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -1357,11 +1639,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `success or single error flat map success extension function with success or multiple errors mapping result must return error success or multiple errors with mapping result error if initial success or single error is success and success or multiple errors mapping result is error`() {
         val mappingError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrSingleError
                 .Success
                 .of<_, Throwable>(Uuid.random().toString())
                 .flatMapSuccess<_, _, _> {
+                    evaluated = true
                     SuccessOrMultipleErrors
                         .Error
                         .of<Int, _>(mappingError)
@@ -1369,6 +1653,7 @@ class SuccessOrMultipleErrorsTest {
                 .toErrors()
 
         assertSoftly {
+            assertTrue { evaluated }
             assertEquals(1, result.size)
             assertContains(result, mappingError)
         }
@@ -1377,11 +1662,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `success or single error flat map success extension function with success or multiple errors mapping result must return success success or multiple errors with mapping result success if initial success or single error is success and success or multiple errors mapping result is success`() {
         val mappingValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrSingleError
                 .Success
                 .of<_, Throwable>(Uuid.random().toString())
                 .flatMapSuccess<_, _, _> {
+                    evaluated = true
                     SuccessOrMultipleErrors
                         .Success
                         .of(mappingValue)
@@ -1389,17 +1676,22 @@ class SuccessOrMultipleErrorsTest {
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(mappingValue, result)
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(mappingValue, result)
+        }
     }
 
     @Test
     fun `success or multiple errors flat map success extension function with success or single error mapping result must return error success or single error with initial error if initial success or multiple errors is error and success or single error mapping result is error`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(initialError)
                 .flatMapSuccess<_, _, _> {
+                    evaluated = true
                     SuccessOrSingleError
                         .Error
                         .of<String, _>(
@@ -1412,6 +1704,7 @@ class SuccessOrMultipleErrorsTest {
                 .orNull()!!
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -1420,11 +1713,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `success or multiple errors flat map success extension function with success or single error mapping result must return error success or single error with initial error if initial success or multiple errors is error and success or single error mapping result is success`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(initialError)
                 .flatMapSuccess<_, _, _> {
+                    evaluated = true
                     SuccessOrSingleError
                         .Success
                         .of(Uuid.random().toString())
@@ -1433,6 +1728,7 @@ class SuccessOrMultipleErrorsTest {
                 .orNull()!!
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -1441,11 +1737,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `success or multiple errors flat map success extension function with success or single error mapping result must return error success or single error with mapping result error if initial success or multiple errors is success and success or single error mapping result is error`() {
         val mappingError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(Uuid.random().toString())
                 .flatMapSuccess<_, _, _> {
+                    evaluated = true
                     SuccessOrSingleError
                         .Error
                         .of<String, _>(
@@ -1458,6 +1756,7 @@ class SuccessOrMultipleErrorsTest {
                 .orNull()!!
 
         assertSoftly {
+            assertTrue { evaluated }
             assertEquals(1, result.size)
             assertContains(result, mappingError)
         }
@@ -1466,11 +1765,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `success or multiple errors flat map success extension function with success or single error mapping result must return success success or single error with mapping result success if initial success or multiple errors is success and success or single error mapping result is success`() {
         val mappingValue = Uuid.random().toString()
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(Uuid.random().toString())
                 .flatMapSuccess<_, _, _> {
+                    evaluated = true
                     SuccessOrSingleError
                         .Success
                         .of(mappingValue)
@@ -1478,17 +1779,22 @@ class SuccessOrMultipleErrorsTest {
                 .toMaybeSuccess()
                 .orNull()!!
 
-        assertEquals(mappingValue, result)
+        assertSoftly {
+            assertTrue { evaluated }
+            assertEquals(mappingValue, result)
+        }
     }
 
     @Test
     fun `success or multiple errors flat map success extension function with maybe errors mapping result must return not empty maybe with initial errors if initial success or multiple errors is error and maybe mapping is not empty`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(initialError)
                 .flatMapSuccess<_, _> {
+                    evaluated = true
                     Maybe
                         .NotEmpty
                         .of(
@@ -1500,6 +1806,7 @@ class SuccessOrMultipleErrorsTest {
                 .orNull()!!
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -1508,16 +1815,19 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `success or multiple errors flat map success extension function with maybe errors mapping result must return not empty maybe with initial errors if initial success or multiple errors is error and maybe mapping is empty`() {
         val initialError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Error
                 .of<String, _>(initialError)
                 .flatMapSuccess<_, _> {
+                    evaluated = true
                     Maybe.Empty.of()
                 }
                 .orNull()!!
 
         assertSoftly {
+            assertFalse { evaluated }
             assertEquals(1, result.size)
             assertContains(result, initialError)
         }
@@ -1526,11 +1836,13 @@ class SuccessOrMultipleErrorsTest {
     @Test
     fun `success or multiple errors flat map success extension function with maybe errors mapping result must return not empty maybe with mapping errors if initial success or multiple errors is success and maybe mapping is not empty`() {
         val mappingError = Exception(Uuid.random().toString())
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(Uuid.random().toString())
                 .flatMapSuccess<_, _> {
+                    evaluated = true
                     Maybe
                         .NotEmpty
                         .of(
@@ -1542,6 +1854,7 @@ class SuccessOrMultipleErrorsTest {
                 .orNull()!!
 
         assertSoftly {
+            assertTrue { evaluated }
             assertEquals(1, result.size)
             assertContains(result, mappingError)
         }
@@ -1549,16 +1862,21 @@ class SuccessOrMultipleErrorsTest {
 
     @Test
     fun `success or multiple errors flat map success extension function with maybe errors mapping result must return empty maybe if initial success or multiple errors is success and maybe mapping is empty`() {
+        var evaluated = false
         val result =
             SuccessOrMultipleErrors
                 .Success
                 .of<_, Throwable>(Uuid.random().toString())
                 .flatMapSuccess<_, _> {
+                    evaluated = true
                     Maybe.Empty.of()
                 }
                 .empty()
 
-        assertTrue { result }
+        assertSoftly {
+            assertTrue { evaluated }
+            assertTrue { result }
+        }
     }
 
     @Test
