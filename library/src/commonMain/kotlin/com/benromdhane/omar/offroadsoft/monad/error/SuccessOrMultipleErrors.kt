@@ -248,3 +248,11 @@ fun <SUCCESS : Any, ERROR : Any, NEW_SUCCESS : Any> SuccessOrMultipleErrors<SUCC
         ) {
             SuccessOrSingleError.Error.of(it)
         }
+
+fun <SUCCESS : Any, ERROR : Any> SuccessOrMultipleErrors<SUCCESS, ERROR>.flatMapSuccess(mapper: (SUCCESS) -> Maybe<Collection<ERROR>>) =
+    this
+        .fold(
+            mapper
+        ) {
+            Maybe.NotEmpty.of(it)
+        }

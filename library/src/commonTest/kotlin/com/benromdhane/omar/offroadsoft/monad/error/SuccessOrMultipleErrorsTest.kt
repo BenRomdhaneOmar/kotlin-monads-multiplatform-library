@@ -1,5 +1,6 @@
 package com.benromdhane.omar.offroadsoft.monad.error
 
+import com.benromdhane.omar.offroadsoft.monad.Maybe
 import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.collections.shouldContainAll
 import kotlin.test.*
@@ -1478,5 +1479,85 @@ class SuccessOrMultipleErrorsTest {
                 .orNull()!!
 
         assertEquals(mappingValue, result)
+    }
+
+    @Test
+    fun `success or multiple errors flat map success extension function with maybe errors mapping result must return not empty maybe with initial errors if initial success or multiple errors is error and maybe mapping is not empty`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccess<_, _> {
+                    Maybe
+                        .NotEmpty
+                        .of(
+                            listOf(
+                                Exception(Uuid.random().toString())
+                            )
+                        )
+                }
+                .orNull()!!
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `success or multiple errors flat map success extension function with maybe errors mapping result must return not empty maybe with initial errors if initial success or multiple errors is error and maybe mapping is empty`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .flatMapSuccess<_, _> {
+                    Maybe.Empty.of()
+                }
+                .orNull()!!
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `success or multiple errors flat map success extension function with maybe errors mapping result must return not empty maybe with mapping errors if initial success or multiple errors is success and maybe mapping is not empty`() {
+        val mappingError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .flatMapSuccess<_, _> {
+                    Maybe
+                        .NotEmpty
+                        .of(
+                            listOf(
+                                mappingError
+                            )
+                        )
+                }
+                .orNull()!!
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, mappingError)
+        }
+    }
+
+    @Test
+    fun `success or multiple errors flat map success extension function with maybe errors mapping result must return empty maybe if initial success or multiple errors is success and maybe mapping is empty`() {
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .flatMapSuccess<_, _> {
+                    Maybe.Empty.of()
+                }
+                .empty()
+
+        assertTrue { result }
     }
 }
