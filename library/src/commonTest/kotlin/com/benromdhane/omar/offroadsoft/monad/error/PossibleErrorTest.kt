@@ -34,7 +34,7 @@ class PossibleErrorTest {
     @Test
     fun `try as possible error must return success if try was initiated as success`() {
         val result =
-            Try.trying { }
+            Try.trying { Uuid.random().toString() }
                 .asPossibleError()
                 .error()
 
@@ -45,7 +45,7 @@ class PossibleErrorTest {
     fun `try as possible error must return error if try was initiated as failure`() {
         val initialError = Exception(Uuid.random().toString())
         val result =
-            Try.seed<Unit>(initialError)
+            Try.seed<String>(initialError)
                 .asPossibleError()
                 .error()
 
@@ -55,8 +55,8 @@ class PossibleErrorTest {
     @Test
     fun `either as possible error must return success if try was initiated as right either error on left or unit on right`() {
         val result =
-            Either.Right.of<Throwable, _>(Unit)
-                .asPossibleError()
+            Either.Right.of<Throwable, _>(Uuid.random().toString())
+                .leftAsPossibleError()
                 .error()
 
         assertFalse { result }
@@ -66,8 +66,8 @@ class PossibleErrorTest {
     fun `either as possible error must return error if try was initiated as left either error on left or unit on right`() {
         val initialError = Exception(Uuid.random().toString())
         val result =
-            Either.Left.of<_, Unit>(initialError)
-                .asPossibleError()
+            Either.Left.of<_, String>(initialError)
+                .leftAsPossibleError()
                 .error()
 
         assertTrue { result }
@@ -76,8 +76,8 @@ class PossibleErrorTest {
     @Test
     fun `either as possible error must return success if try was initiated as left either error on right or unit on left`() {
         val result =
-            Either.Left.of<_, Throwable>(Unit)
-                .asPossibleError()
+            Either.Left.of<_, Throwable>(Uuid.random().toString())
+                .rightAsPossibleError()
                 .error()
 
         assertFalse { result }
@@ -87,8 +87,8 @@ class PossibleErrorTest {
     fun `either as possible error must return error if try was initiated as right either error on right or unit on left`() {
         val initialError = Exception(Uuid.random().toString())
         val result =
-            Either.Right.of<Unit, _>(initialError)
-                .asPossibleError()
+            Either.Right.of<String, _>(initialError)
+                .rightAsPossibleError()
                 .error()
 
         assertTrue { result }
@@ -232,5 +232,54 @@ class PossibleErrorTest {
                 .equals(null)
 
         assertFalse { result }
+    }
+
+    @Test
+    fun `to filtered maybe error must return empty if initial possible error is success and filter is not valid`() {
+        val result =
+            PossibleError
+                .Success
+                .of<Throwable>()
+                .toFilteredMaybeError { false }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe error must return empty if initial possible error is success and filter is valid`() {
+        val result =
+            PossibleError
+                .Success
+                .of<Throwable>()
+                .toFilteredMaybeError { true }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe error must return empty if initial possible error is error and filter is not valid`() {
+        val result =
+            PossibleError
+                .Error
+                .of(Exception(Uuid.random().toString()))
+                .toFilteredMaybeError { false }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe error must return non empty with initial error if initial possible error is error and filter is valid`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            PossibleError
+                .Error
+                .of(initialError)
+                .toFilteredMaybeError { true }
+                .orNull()!!
+
+        assertEquals(initialError, result)
     }
 }

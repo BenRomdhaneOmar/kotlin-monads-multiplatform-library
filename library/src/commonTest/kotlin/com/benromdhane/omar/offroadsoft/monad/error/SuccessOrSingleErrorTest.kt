@@ -1481,4 +1481,102 @@ class SuccessOrSingleErrorTest {
 
         assertEquals(initialError, result)
     }
+
+    @Test
+    fun `to filtered maybe success must return empty maybe if success or single error is error and filter is not valid`() {
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .toFilteredMaybeSuccess { false }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe success must return empty maybe if success or single error is error and filter is valid`() {
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .toFilteredMaybeSuccess { true }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe success must return empty maybe if success or single error is success and filter is not valid`() {
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .toFilteredMaybeSuccess { false }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe success must return non empty maybe with initial success if success or single error is success and filter is valid`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(initialValue)
+                .toFilteredMaybeSuccess { true }
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
+
+    @Test
+    fun `to filtered maybe error must return empty maybe if success or single error is success and filter is not valid`() {
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .toFilteredMaybeError { false }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe error must return empty maybe if success or single error is success and filter is valid`() {
+        val result =
+            SuccessOrSingleError
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .toFilteredMaybeError { true }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe error must return empty maybe if success or single error is error and filter is not valid`() {
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .toFilteredMaybeError { false }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe error must return non empty maybe with initial error if success or single error is error and filter is valid`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrSingleError
+                .Error
+                .of<String, _>(initialError)
+                .toFilteredMaybeError { true }
+                .orNull()!!
+
+        assertEquals(initialError, result)
+    }
 }

@@ -232,3 +232,11 @@ fun <SUCCESS : Any, ERROR : Any> SuccessOrSingleError<SUCCESS, ERROR>.asPossible
             { PossibleError.Success.of() },
             { PossibleError.Error.of(it) },
         )
+
+fun <SUCCESS : Any, ERROR : Any> SuccessOrSingleError<SUCCESS, ERROR>.toFilteredMaybeSuccess(condition: (SUCCESS) -> Boolean) =
+    this.toMaybeSuccess()
+        .filter(condition)
+
+fun <SUCCESS : Any, ERROR : Any> SuccessOrSingleError<SUCCESS, ERROR>.toFilteredMaybeError(condition: (ERROR) -> Boolean) =
+    this.toMaybeError()
+        .filter(condition)
