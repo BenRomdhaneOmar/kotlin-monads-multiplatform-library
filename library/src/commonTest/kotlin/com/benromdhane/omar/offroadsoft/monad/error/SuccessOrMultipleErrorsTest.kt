@@ -1560,4 +1560,34 @@ class SuccessOrMultipleErrorsTest {
 
         assertTrue { result }
     }
+
+    @Test
+    fun `as possible error must return error possible error with initial errors if initial success or multiple errors initiated as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .asPossibleError()
+                .toMaybeError()
+                .orNull()!!
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
+    fun `as possible error must return non error possible error if initial success or multiple errors initiated as success`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .asPossibleError()
+                .error()
+
+        assertFalse { result }
+    }
 }

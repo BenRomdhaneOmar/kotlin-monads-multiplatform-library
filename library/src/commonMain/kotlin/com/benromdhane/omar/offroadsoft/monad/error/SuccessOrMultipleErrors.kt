@@ -256,3 +256,10 @@ fun <SUCCESS : Any, ERROR : Any> SuccessOrMultipleErrors<SUCCESS, ERROR>.flatMap
         ) {
             Maybe.NotEmpty.of(it)
         }
+
+fun <SUCCESS : Any, ERROR : Any> SuccessOrMultipleErrors<SUCCESS, ERROR>.asPossibleError() =
+    this
+        .fold(
+            { PossibleError.Success.of() },
+            { PossibleError.Error.of(it) }
+        )
