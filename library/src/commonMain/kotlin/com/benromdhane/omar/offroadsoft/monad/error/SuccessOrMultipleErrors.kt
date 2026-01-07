@@ -263,3 +263,7 @@ fun <SUCCESS : Any, ERROR : Any> SuccessOrMultipleErrors<SUCCESS, ERROR>.asPossi
             { PossibleError.Success.of() },
             { PossibleError.Error.of(it) }
         )
+
+fun <SUCCESS : Any, ERROR : Any> SuccessOrMultipleErrors<SUCCESS, ERROR>.toFilteredMaybeSuccess(condition: (SUCCESS) -> Boolean) =
+    this.toMaybeSuccess()
+        .filter(condition)

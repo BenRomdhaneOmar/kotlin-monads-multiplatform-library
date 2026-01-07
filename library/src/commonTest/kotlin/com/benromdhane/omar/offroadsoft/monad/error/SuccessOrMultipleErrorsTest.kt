@@ -1908,4 +1908,53 @@ class SuccessOrMultipleErrorsTest {
 
         assertFalse { result }
     }
+
+    @Test
+    fun `to filtered maybe success must return empty maybe if success or multiple errors created as error and filter is not valid`() {
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .toFilteredMaybeSuccess { false }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe success must return empty maybe if success or multiple errors created as error and filter is valid`() {
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(Exception(Uuid.random().toString()))
+                .toFilteredMaybeSuccess { true }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe success must return empty maybe if success or multiple errors created as success and filter is not valid`() {
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(Uuid.random().toString())
+                .toFilteredMaybeSuccess { false }
+                .empty()
+
+        assertTrue { result }
+    }
+
+    @Test
+    fun `to filtered maybe success must return non empty maybe with initial success if success or multiple errors created as success and filter is valid`() {
+        val initialValue = Uuid.random().toString()
+        val result =
+            SuccessOrMultipleErrors
+                .Success
+                .of<_, Throwable>(initialValue)
+                .toFilteredMaybeSuccess { true }
+                .orNull()!!
+
+        assertEquals(initialValue, result)
+    }
 }
