@@ -199,6 +199,22 @@ class SuccessOrMultipleErrorsTest {
     }
 
     @Test
+    fun `add errors with empty collection must be ignored if success or multiple errors created as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .addErrors(emptyList())
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
+        }
+    }
+
+    @Test
     fun `add error with collection must be ignored if success or multiple errors created as success`() {
         val initialValue = Uuid.random().toString()
         val result =
@@ -227,6 +243,22 @@ class SuccessOrMultipleErrorsTest {
             assertEquals(1 + additionalErrors.size, result.size)
             assertContains(result, initialError)
             result.shouldContainAll(additionalErrors)
+        }
+    }
+
+    @Test
+    fun `add errors with no varargs must be ignored if success or multiple errors created as error`() {
+        val initialError = Exception(Uuid.random().toString())
+        val result =
+            SuccessOrMultipleErrors
+                .Error
+                .of<String, _>(initialError)
+                .addErrors()
+                .toErrors()
+
+        assertSoftly {
+            assertEquals(1, result.size)
+            assertContains(result, initialError)
         }
     }
 
