@@ -51,6 +51,12 @@
 
 [Success or multiple errors test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/error/SuccessOrMultipleErrorsTest.kt)
 
+## Evaluations:
+
+### Evaluate element:
+
+[Evaluate element test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/evaluation/EvaluateElementTest.kt)
+
 ## Dependencies:
 
 [Maven central dependencies](https://central.sonatype.com/search?q=kotlin-monads-multiplatform-library&namespace=io.github.benromdhaneomar)
