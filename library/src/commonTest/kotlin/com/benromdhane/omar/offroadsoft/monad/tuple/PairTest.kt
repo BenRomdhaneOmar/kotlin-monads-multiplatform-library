@@ -113,4 +113,21 @@ class PairTest {
             assertEquals(firstValue, result.secondElement)
         }
     }
+
+    @Test
+    fun `transform must return transformation result`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val result =
+            Pair
+                .of(
+                    firstValue,
+                    secondValue
+                )
+                .transform { first, second ->
+                    first.length + second.length
+                }
+
+        assertEquals(firstValue.length + secondValue.length, result)
+    }
 }

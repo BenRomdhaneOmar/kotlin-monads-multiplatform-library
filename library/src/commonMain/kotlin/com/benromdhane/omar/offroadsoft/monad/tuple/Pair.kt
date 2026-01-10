@@ -27,6 +27,14 @@ data class Pair<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any>(
             this.firstElement
         )
 
+    fun <RESULT> transform(
+        transformer: (FIRST_ELEMENT, SECOND_ELEMENT) -> RESULT
+    ) =
+        transformer(
+            this.firstElement,
+            this.secondElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any> of(
