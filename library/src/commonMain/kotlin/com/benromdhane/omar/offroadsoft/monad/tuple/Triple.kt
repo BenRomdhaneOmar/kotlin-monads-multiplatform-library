@@ -54,6 +54,12 @@ data class Triple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any
             this.secondElement
         )
 
+    fun toPair() =
+        Pair.of(
+            this.firstElement,
+            this.secondElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any> of(

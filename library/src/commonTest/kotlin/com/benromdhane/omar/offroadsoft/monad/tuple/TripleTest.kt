@@ -194,4 +194,24 @@ class TripleTest {
             assertEquals(secondValue, result.thirdElement)
         }
     }
+
+    @Test
+    fun `to pair must return pair with triple first and second elements`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val result =
+            Triple
+                .of(
+                    firstValue,
+                    secondValue,
+                    thirdValue
+                )
+                .toPair()
+
+        assertSoftly {
+            assertEquals(firstValue, result.firstElement)
+            assertEquals(secondValue, result.secondElement)
+        }
+    }
 }
