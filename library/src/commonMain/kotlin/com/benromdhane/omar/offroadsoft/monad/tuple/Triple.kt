@@ -24,6 +24,15 @@ data class Triple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any
             this.thirdElement
         )
 
+    fun <NEW_THIRD_ELEMENT : Any> mapThird(
+        mapper: (THIRD_ELEMENT) -> NEW_THIRD_ELEMENT
+    ) =
+        Triple(
+            this.firstElement,
+            this.secondElement,
+            mapper(this.thirdElement)
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any> of(

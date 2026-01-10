@@ -70,7 +70,7 @@ class TripleTest {
     }
 
     @Test
-    fun `map first must return a pair with mapped initial first values`() {
+    fun `map first must return a triple with mapped initial first values`() {
         val firstValue = Uuid.random().toString()
         val secondValue = Uuid.random().toString()
         val thirdValue = Uuid.random().toString()
@@ -91,7 +91,7 @@ class TripleTest {
     }
 
     @Test
-    fun `map second must return a pair with mapped initial first values`() {
+    fun `map second must return a triple with mapped initial second values`() {
         val firstValue = Uuid.random().toString()
         val secondValue = Uuid.random().toString()
         val thirdValue = Uuid.random().toString()
@@ -108,6 +108,27 @@ class TripleTest {
             assertEquals(firstValue, result.firstElement)
             assertEquals(secondValue.length, result.secondElement)
             assertEquals(thirdValue, result.thirdElement)
+        }
+    }
+
+    @Test
+    fun `map third must return a triple with mapped initial third values`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val result =
+            Triple
+                .of(
+                    firstValue,
+                    secondValue,
+                    thirdValue
+                )
+                .mapThird { it.length }
+
+        assertSoftly {
+            assertEquals(firstValue, result.firstElement)
+            assertEquals(secondValue, result.secondElement)
+            assertEquals(thirdValue.length, result.thirdElement)
         }
     }
 }
