@@ -95,4 +95,22 @@ class PairTest {
             assertEquals(secondValue.length, result.secondElement)
         }
     }
+
+    @Test
+    fun `switch first and second elements must return a pair with initial first element as second element and initial second element as first element`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val result =
+            Pair
+                .of(
+                    firstValue,
+                    secondValue
+                )
+                .switchFirstAndSecondElements()
+
+        assertSoftly {
+            assertEquals(secondValue, result.firstElement)
+            assertEquals(firstValue, result.secondElement)
+        }
+    }
 }

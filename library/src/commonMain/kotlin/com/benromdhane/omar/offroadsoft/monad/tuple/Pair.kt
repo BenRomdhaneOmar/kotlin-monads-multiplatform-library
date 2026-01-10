@@ -21,6 +21,12 @@ data class Pair<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any>(
             mapper(this.secondElement)
         )
 
+    fun switchFirstAndSecondElements() =
+        Pair(
+            this.secondElement,
+            this.firstElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any> of(
