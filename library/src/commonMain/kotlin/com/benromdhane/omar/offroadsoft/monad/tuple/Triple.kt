@@ -153,3 +153,12 @@ data class Triple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any
         }
     }
 }
+
+fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any> Pair<FIRST_ELEMENT, SECOND_ELEMENT>.toTriple(
+    thirdElement: THIRD_ELEMENT
+) =
+    Triple.of(
+        this.firstElement,
+        this.secondElement,
+        thirdElement
+    )
