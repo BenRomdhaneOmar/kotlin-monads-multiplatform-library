@@ -69,6 +69,14 @@ data class Triple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any
             this.thirdElement
         )
 
+    fun <RESULT> transform(
+        transformer: (FIRST_ELEMENT, SECOND_ELEMENT) -> RESULT
+    ) =
+        transformer(
+            this.firstElement,
+            this.secondElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any> of(
