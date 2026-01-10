@@ -13,6 +13,14 @@ data class Pair<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any>(
             this.secondElement
         )
 
+    fun <NEW_SECOND_ELEMENT : Any> mapSecond(
+        mapper: (SECOND_ELEMENT) -> NEW_SECOND_ELEMENT
+    ) =
+        Pair(
+            this.firstElement,
+            mapper(this.secondElement)
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any> of(

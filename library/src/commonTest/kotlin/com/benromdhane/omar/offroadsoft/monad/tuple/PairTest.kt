@@ -77,4 +77,22 @@ class PairTest {
             assertEquals(secondValue, result.secondElement)
         }
     }
+
+    @Test
+    fun `map second must return a pair with mapped initial second values`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val result =
+            Pair
+                .of(
+                    firstValue,
+                    secondValue
+                )
+                .mapSecond { it.length }
+
+        assertSoftly {
+            assertEquals(firstValue, result.firstElement)
+            assertEquals(secondValue.length, result.secondElement)
+        }
+    }
 }
