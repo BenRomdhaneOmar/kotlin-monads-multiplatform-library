@@ -33,6 +33,13 @@ data class Triple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any
             mapper(this.thirdElement)
         )
 
+    fun switchFirstAndSecondElements() =
+        Triple(
+            this.secondElement,
+            this.firstElement,
+            this.thirdElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any> of(
