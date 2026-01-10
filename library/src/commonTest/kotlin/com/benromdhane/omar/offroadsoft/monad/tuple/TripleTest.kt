@@ -236,4 +236,23 @@ class TripleTest {
             assertEquals(thirdValue, result.thirdElement)
         }
     }
+
+    @Test
+    fun `transform must return transformed result`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val result =
+            Triple
+                .of(
+                    firstValue,
+                    secondValue,
+                    thirdValue
+                )
+                .transform { first, second, third ->
+                    first.length + second.length + third.length
+                }
+
+        assertEquals(firstValue.length + secondValue.length + thirdValue.length, result)
+    }
 }
