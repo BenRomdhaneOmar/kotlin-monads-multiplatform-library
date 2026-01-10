@@ -4,7 +4,7 @@ import com.benromdhane.omar.offroadsoft.monad.error.PossibleError
 import com.benromdhane.omar.offroadsoft.monad.error.SuccessOrMultipleErrors
 
 @ConsistentCopyVisibility
-data class EvaluateElement<ELEMENT : Any, ERROR : Any> private constructor(
+data class EvaluateOneElement<ELEMENT : Any, ERROR : Any> private constructor(
     private val element: ELEMENT,
     private val evaluations: Set<Evaluation<ELEMENT, ERROR>> = emptySet()
 ) {
@@ -13,7 +13,7 @@ data class EvaluateElement<ELEMENT : Any, ERROR : Any> private constructor(
         error: () -> ERROR,
         check: (ELEMENT) -> Boolean
     ) =
-        EvaluateElement(
+        EvaluateOneElement(
             this.element,
             this.evaluations
                 .plus(
@@ -39,42 +39,42 @@ data class EvaluateElement<ELEMENT : Any, ERROR : Any> private constructor(
         fun <ELEMENT : Any, ERROR : Any> instance(
             element: ELEMENT
         ) =
-            EvaluateElement<_, ERROR>(
+            EvaluateOneElement<_, ERROR>(
                 element
             )
 
         fun <ELEMENT : Any, ERROR : Any> instance(
             element: () -> ELEMENT
         ) =
-            EvaluateElement<_, ERROR>(
+            EvaluateOneElement<_, ERROR>(
                 element()
             )
     }
+}
 
-    @ConsistentCopyVisibility
-    private data class Evaluation<ELEMENT : Any, ERROR : Any> private constructor(
-        val error: () -> ERROR,
-        val check: (ELEMENT) -> Boolean
-    ) {
-        fun evaluate(
-            element: ELEMENT
+@ConsistentCopyVisibility
+private data class Evaluation<ELEMENT : Any, ERROR : Any> private constructor(
+    val error: () -> ERROR,
+    val check: (ELEMENT) -> Boolean
+) {
+    fun evaluate(
+        element: ELEMENT
+    ) =
+        if (this.check(element))
+            PossibleError.Success.of()
+        else
+            PossibleError.Error.of(this.error())
+
+    companion object Builder {
+
+        fun <ELEMENT : Any, ERROR : Any> of(
+            error: () -> ERROR,
+            check: (ELEMENT) -> Boolean
         ) =
-            if (this.check(element))
-                PossibleError.Success.of()
-            else
-                PossibleError.Error.of(this.error())
-
-        companion object Builder {
-
-            fun <ELEMENT : Any, ERROR : Any> of(
-                error: () -> ERROR,
-                check: (ELEMENT) -> Boolean
-            ) =
-                Evaluation(
-                    error,
-                    check
-                )
-        }
+            Evaluation(
+                error,
+                check
+            )
     }
 }
 
