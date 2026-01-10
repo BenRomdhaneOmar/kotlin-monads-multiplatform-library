@@ -6,6 +6,15 @@ data class Triple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any
     val thirdElement: THIRD_ELEMENT
 ) {
 
+    fun <NEW_FIRST_ELEMENT : Any> mapFirst(
+        mapper: (FIRST_ELEMENT) -> NEW_FIRST_ELEMENT
+    ) =
+        Triple(
+            mapper(this.firstElement),
+            this.secondElement,
+            this.thirdElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any> of(
