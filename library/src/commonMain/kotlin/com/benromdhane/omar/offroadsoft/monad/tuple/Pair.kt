@@ -5,6 +5,14 @@ data class Pair<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any>(
     val secondElement: SECOND_ELEMENT
 ) {
 
+    fun <NEW_FIRST_ELEMENT : Any> mapFirst(
+        mapper: (FIRST_ELEMENT) -> NEW_FIRST_ELEMENT
+    ) =
+        Pair(
+            mapper(this.firstElement),
+            this.secondElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any> of(
@@ -53,7 +61,7 @@ data class Pair<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any>(
                     secondElement
                 )
 
-            companion object Builder {
+            internal companion object Builder {
 
                 fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any> instance(
                     firstElement: FIRST_ELEMENT
