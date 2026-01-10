@@ -152,4 +152,25 @@ class TripleTest {
             assertEquals(thirdValue, result.thirdElement)
         }
     }
+
+    @Test
+    fun `switch first and third elements must return a triple with switched initial values`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val result =
+            Triple
+                .of(
+                    firstValue,
+                    secondValue,
+                    thirdValue
+                )
+                .switchFirstAndThirdElements()
+
+        assertSoftly {
+            assertEquals(thirdValue, result.firstElement)
+            assertEquals(secondValue, result.secondElement)
+            assertEquals(firstValue, result.thirdElement)
+        }
+    }
 }

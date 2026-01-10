@@ -40,6 +40,13 @@ data class Triple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any
             this.thirdElement
         )
 
+    fun switchFirstAndThirdElements() =
+        Triple(
+            this.thirdElement,
+            this.secondElement,
+            this.firstElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any> of(
