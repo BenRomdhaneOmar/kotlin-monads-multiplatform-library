@@ -53,6 +53,17 @@ data class Quintuple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : 
             this.fifthElement
         )
 
+    fun <NEW_FIFTH_ELEMENT : Any> mapFifth(
+        mapper: (FIFTH_ELEMENT) -> NEW_FIFTH_ELEMENT
+    ) =
+        Quintuple(
+            this.firstElement,
+            this.secondElement,
+            this.thirdElement,
+            this.fourthElement,
+            mapper(this.fifthElement)
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEMENT : Any, FIFTH_ELEMENT : Any> of(
