@@ -393,3 +393,15 @@ fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEM
         this.fourthElement,
         fifthElement
     )
+
+fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEMENT : Any, FIFTH_ELEMENT : Any> Triple<FIRST_ELEMENT, SECOND_ELEMENT, THIRD_ELEMENT>.toQuintuple(
+    fourthElement: FOURTH_ELEMENT,
+    fifthElement: FIFTH_ELEMENT
+) =
+    Quintuple.of(
+        this.firstElement,
+        this.secondElement,
+        this.thirdElement,
+        fourthElement,
+        fifthElement
+    )
