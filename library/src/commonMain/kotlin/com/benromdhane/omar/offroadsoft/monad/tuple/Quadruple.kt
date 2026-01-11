@@ -71,6 +71,14 @@ data class Quadruple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : 
             this.firstElement
         )
 
+    fun switchSecondAndThirdElements() =
+        Quadruple(
+            this.firstElement,
+            this.thirdElement,
+            this.secondElement,
+            this.fourthElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEMENT : Any> of(
