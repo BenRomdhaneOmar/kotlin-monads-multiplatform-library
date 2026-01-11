@@ -566,4 +566,38 @@ class QuintupleTest {
             assertEquals(secondValue, result.secondElement)
         }
     }
+
+    @Test
+    fun `transform must return transformed result`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val fourthValue = Uuid.random().toString()
+        val fifthValue = Uuid.random().toString()
+        val result =
+            Quintuple
+                .of(
+                    firstValue,
+                    secondValue,
+                    thirdValue,
+                    fourthValue,
+                    fifthValue
+                )
+                .transform { first, second, third, fourth, fifth ->
+                    first.length +
+                            second.length +
+                            third.length +
+                            fourth.length +
+                            fifth.length
+                }
+
+        assertEquals(
+            firstValue.length +
+                    secondValue.length +
+                    thirdValue.length +
+                    fourthValue.length +
+                    fifthValue.length,
+            result
+        )
+    }
 }
