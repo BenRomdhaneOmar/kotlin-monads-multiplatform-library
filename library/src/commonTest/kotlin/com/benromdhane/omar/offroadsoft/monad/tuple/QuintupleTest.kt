@@ -221,4 +221,31 @@ class QuintupleTest {
             assertEquals(fifthValue.length, result.fifthElement)
         }
     }
+
+    @Test
+    fun `switch first and second elements must return a quintuple with switched initial values`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val fourthValue = Uuid.random().toString()
+        val fifthValue = Uuid.random().toString()
+        val result =
+            Quintuple
+                .of(
+                    firstValue,
+                    secondValue,
+                    thirdValue,
+                    fourthValue,
+                    fifthValue
+                )
+                .switchFirstAndSecondElements()
+
+        assertSoftly {
+            assertEquals(secondValue, result.firstElement)
+            assertEquals(firstValue, result.secondElement)
+            assertEquals(thirdValue, result.thirdElement)
+            assertEquals(fourthValue, result.fourthElement)
+            assertEquals(fifthValue, result.fifthElement)
+        }
+    }
 }
