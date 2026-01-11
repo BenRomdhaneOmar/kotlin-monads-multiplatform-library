@@ -405,3 +405,16 @@ fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEM
         fourthElement,
         fifthElement
     )
+
+fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEMENT : Any, FIFTH_ELEMENT : Any> Pair<FIRST_ELEMENT, SECOND_ELEMENT>.toQuintuple(
+    thirdElement: THIRD_ELEMENT,
+    fourthElement: FOURTH_ELEMENT,
+    fifthElement: FIFTH_ELEMENT
+) =
+    Quintuple.of(
+        this.firstElement,
+        this.secondElement,
+        thirdElement,
+        fourthElement,
+        fifthElement
+    )

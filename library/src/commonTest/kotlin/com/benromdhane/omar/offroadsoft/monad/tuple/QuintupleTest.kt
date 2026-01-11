@@ -744,4 +744,32 @@ class QuintupleTest {
             assertEquals(fifthValue, result.fifthElement)
         }
     }
+
+    @Test
+    fun `pair to quintuple must return quintuple with initial elements`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val fourthValue = Uuid.random().toString()
+        val fifthValue = Uuid.random().toString()
+        val result =
+            Pair
+                .of(
+                    firstValue,
+                    secondValue
+                )
+                .toQuintuple(
+                    thirdValue,
+                    fourthValue,
+                    fifthValue
+                )
+
+        assertSoftly {
+            assertEquals(firstValue, result.firstElement)
+            assertEquals(secondValue, result.secondElement)
+            assertEquals(thirdValue, result.thirdElement)
+            assertEquals(fourthValue, result.fourthElement)
+            assertEquals(fifthValue, result.fifthElement)
+        }
+    }
 }
