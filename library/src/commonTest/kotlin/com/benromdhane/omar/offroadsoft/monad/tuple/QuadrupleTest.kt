@@ -149,4 +149,28 @@ class QuadrupleTest {
             assertEquals(fourthValue, result.fourthElement)
         }
     }
+
+    @Test
+    fun `map fourth must return a quadruple with mapped initial fourth values`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val fourthValue = Uuid.random().toString()
+        val result =
+            Quadruple
+                .of(
+                    firstValue,
+                    secondValue,
+                    thirdValue,
+                    fourthValue
+                )
+                .mapFourth { it.length }
+
+        assertSoftly {
+            assertEquals(firstValue, result.firstElement)
+            assertEquals(secondValue, result.secondElement)
+            assertEquals(thirdValue, result.thirdElement)
+            assertEquals(fourthValue.length, result.fourthElement)
+        }
+    }
 }

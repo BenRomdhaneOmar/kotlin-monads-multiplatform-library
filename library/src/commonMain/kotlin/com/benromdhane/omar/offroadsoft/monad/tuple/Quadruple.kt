@@ -37,6 +37,16 @@ data class Quadruple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : 
             this.fourthElement
         )
 
+    fun <NEW_FOURTH_ELEMENT : Any> mapFourth(
+        mapper: (FOURTH_ELEMENT) -> NEW_FOURTH_ELEMENT
+    ) =
+        Quadruple(
+            this.firstElement,
+            this.secondElement,
+            this.thirdElement,
+            mapper(this.fourthElement)
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEMENT : Any> of(
