@@ -142,7 +142,7 @@ class QuintupleTest {
     }
 
     @Test
-    fun `map third must return a quadruple with mapped initial third values`() {
+    fun `map third must return a quintuple with mapped initial third values`() {
         val firstValue = Uuid.random().toString()
         val secondValue = Uuid.random().toString()
         val thirdValue = Uuid.random().toString()
@@ -164,6 +164,33 @@ class QuintupleTest {
             assertEquals(secondValue, result.secondElement)
             assertEquals(thirdValue.length, result.thirdElement)
             assertEquals(fourthValue, result.fourthElement)
+            assertEquals(fifthValue, result.fifthElement)
+        }
+    }
+
+    @Test
+    fun `map fourth must return a quintuple with mapped initial fourth values`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val fourthValue = Uuid.random().toString()
+        val fifthValue = Uuid.random().toString()
+        val result =
+            Quintuple
+                .of(
+                    firstValue,
+                    secondValue,
+                    thirdValue,
+                    fourthValue,
+                    fifthValue
+                )
+                .mapFourth { it.length }
+
+        assertSoftly {
+            assertEquals(firstValue, result.firstElement)
+            assertEquals(secondValue, result.secondElement)
+            assertEquals(thirdValue, result.thirdElement)
+            assertEquals(fourthValue.length, result.fourthElement)
             assertEquals(fifthValue, result.fifthElement)
         }
     }
