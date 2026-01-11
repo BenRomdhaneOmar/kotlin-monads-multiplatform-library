@@ -274,3 +274,14 @@ fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEM
         this.thirdElement,
         fourthElement
     )
+
+fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEMENT : Any> Pair<FIRST_ELEMENT, SECOND_ELEMENT>.toQuadruple(
+    thirdElement: THIRD_ELEMENT,
+    fourthElement: FOURTH_ELEMENT
+) =
+    Quadruple.of(
+        this.firstElement,
+        this.secondElement,
+        thirdElement,
+        fourthElement
+    )
