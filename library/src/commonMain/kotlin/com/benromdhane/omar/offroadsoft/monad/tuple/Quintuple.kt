@@ -382,3 +382,14 @@ data class Quintuple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : 
         }
     }
 }
+
+fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEMENT : Any, FIFTH_ELEMENT : Any> Quadruple<FIRST_ELEMENT, SECOND_ELEMENT, THIRD_ELEMENT, FOURTH_ELEMENT>.toQuintuple(
+    fifthElement: FIFTH_ELEMENT
+) =
+    Quintuple.of(
+        this.firstElement,
+        this.secondElement,
+        this.thirdElement,
+        this.fourthElement,
+        fifthElement
+    )
