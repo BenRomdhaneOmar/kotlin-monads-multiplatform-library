@@ -155,7 +155,7 @@ data class Quintuple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : 
         )
 
     fun toQuadruple() =
-        Quadruple(
+        Quadruple.of(
             this.firstElement,
             this.secondElement,
             this.thirdElement,
@@ -163,10 +163,16 @@ data class Quintuple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : 
         )
 
     fun toTriple() =
-        Triple(
+        Triple.of(
             this.firstElement,
             this.secondElement,
             this.thirdElement
+        )
+
+    fun toPair() =
+        Pair.of(
+            this.firstElement,
+            this.secondElement
         )
 
     companion object Builder {
