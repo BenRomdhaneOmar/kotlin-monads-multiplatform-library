@@ -446,4 +446,27 @@ class QuadrupleTest {
             result
         )
     }
+
+    @Test
+    fun `triple to quadruple must return quadruple witj initial elements`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val fourthValue = Uuid.random().toString()
+        val result =
+            Triple
+                .of(
+                    firstValue,
+                    secondValue,
+                    thirdValue
+                )
+                .toQuadruple(fourthValue)
+
+        assertSoftly {
+            assertEquals(firstValue, result.firstElement)
+            assertEquals(secondValue, result.secondElement)
+            assertEquals(thirdValue, result.thirdElement)
+            assertEquals(fourthValue, result.fourthElement)
+        }
+    }
 }

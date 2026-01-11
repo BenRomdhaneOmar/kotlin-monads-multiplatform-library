@@ -264,3 +264,13 @@ data class Quadruple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : 
         }
     }
 }
+
+fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEMENT : Any> Triple<FIRST_ELEMENT, SECOND_ELEMENT, THIRD_ELEMENT>.toQuadruple(
+    fourthElement: FOURTH_ELEMENT
+) =
+    Quadruple.of(
+        this.firstElement,
+        this.secondElement,
+        this.thirdElement,
+        fourthElement
+    )
