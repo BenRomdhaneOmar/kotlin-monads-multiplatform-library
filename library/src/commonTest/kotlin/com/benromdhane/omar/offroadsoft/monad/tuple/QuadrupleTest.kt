@@ -392,4 +392,32 @@ class QuadrupleTest {
             result
         )
     }
+
+    @Test
+    fun `transform without fourth element must return transformed result`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val fourthValue = Uuid.random().toString()
+        val result =
+            Quadruple
+                .of(
+                    firstValue,
+                    secondValue,
+                    thirdValue,
+                    fourthValue
+                )
+                .transform { first, second, third ->
+                    first.length +
+                            second.length +
+                            third.length
+                }
+
+        assertEquals(
+            firstValue.length +
+                    secondValue.length +
+                    thirdValue.length,
+            result
+        )
+    }
 }
