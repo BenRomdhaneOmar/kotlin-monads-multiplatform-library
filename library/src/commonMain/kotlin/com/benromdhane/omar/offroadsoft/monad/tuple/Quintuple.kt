@@ -154,6 +154,14 @@ data class Quintuple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : 
             this.fourthElement
         )
 
+    fun toQuadruple() =
+        Quadruple(
+            this.firstElement,
+            this.secondElement,
+            this.thirdElement,
+            this.fourthElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEMENT : Any, FIFTH_ELEMENT : Any> of(
