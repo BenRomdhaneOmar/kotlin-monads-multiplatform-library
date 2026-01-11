@@ -53,9 +53,27 @@
 
 ## Evaluations:
 
-### Evaluate element:
+### Evaluate one element:
 
 [Evaluate element test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/evaluation/EvaluateElementTest.kt)
+
+## Tuples:
+
+### Pair:
+
+[Pair test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/tuple/PairTest.kt)
+
+### Triple:
+
+[Triple test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/tuple/TripleTest.kt)
+
+### Quadruple:
+
+[Quadruple test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/tuple/QuadrupleTest.kt)
+
+### Quintuple:
+
+[Quintuple test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/tuple/QuintupleTest.kt)
 
 ## Dependencies:
 
