@@ -47,6 +47,14 @@ data class Quadruple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : 
             mapper(this.fourthElement)
         )
 
+    fun switchFirstAndSecondElements() =
+        Quadruple(
+            this.secondElement,
+            this.firstElement,
+            this.thirdElement,
+            this.fourthElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEMENT : Any> of(
