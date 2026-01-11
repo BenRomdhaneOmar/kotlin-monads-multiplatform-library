@@ -118,6 +118,15 @@ data class Quintuple<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : 
             this.fifthElement
         )
 
+    fun switchSecondAndFifthElements() =
+        Quintuple(
+            this.firstElement,
+            this.fifthElement,
+            this.thirdElement,
+            this.fourthElement,
+            this.secondElement
+        )
+
     companion object Builder {
 
         fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, THIRD_ELEMENT : Any, FOURTH_ELEMENT : Any, FIFTH_ELEMENT : Any> of(
