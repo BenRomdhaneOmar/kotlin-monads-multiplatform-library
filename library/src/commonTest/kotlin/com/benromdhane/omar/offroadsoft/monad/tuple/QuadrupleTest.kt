@@ -293,4 +293,28 @@ class QuadrupleTest {
             assertEquals(secondValue, result.fourthElement)
         }
     }
+
+    @Test
+    fun `switch third and fourth elements must return a quadruple with switched initial values`() {
+        val firstValue = Uuid.random().toString()
+        val secondValue = Uuid.random().toString()
+        val thirdValue = Uuid.random().toString()
+        val fourthValue = Uuid.random().toString()
+        val result =
+            Quadruple
+                .of(
+                    firstValue,
+                    secondValue,
+                    thirdValue,
+                    fourthValue
+                )
+                .switchThirdAndFourthElements()
+
+        assertSoftly {
+            assertEquals(firstValue, result.firstElement)
+            assertEquals(secondValue, result.secondElement)
+            assertEquals(fourthValue, result.thirdElement)
+            assertEquals(thirdValue, result.fourthElement)
+        }
+    }
 }
