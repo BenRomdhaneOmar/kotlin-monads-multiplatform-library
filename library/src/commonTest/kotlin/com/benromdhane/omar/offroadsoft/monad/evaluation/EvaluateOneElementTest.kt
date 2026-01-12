@@ -8,40 +8,15 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-class EvaluateElementTest {
-
-    @Test
-    fun `evaluate must return success success or multiple errors if no evaluation was provided and evaluation element was initiated with a seed`() {
-        val elementToEvaluate = Uuid.random().toString()
-        val result =
-            EvaluateElement
-                .instance<_, Throwable>(elementToEvaluate)
-                .evaluate()
-                .toMaybeSuccess()
-                .orNull()!!
-
-        assertEquals(elementToEvaluate, result)
-    }
-
-    @Test
-    fun `evaluate must return success success or multiple errors if no evaluation was provided and evaluation element was initiated with element provider`() {
-        val elementToEvaluate = Uuid.random().toString()
-        val result =
-            EvaluateElement
-                .instance<_, Throwable> { elementToEvaluate }
-                .evaluate()
-                .toMaybeSuccess()
-                .orNull()!!
-
-        assertEquals(elementToEvaluate, result)
-    }
+class EvaluateOneElementTest {
 
     @Test
     fun `evaluate must return success success or multiple errors if one valid evaluation was provided`() {
         val elementToEvaluate = Uuid.random().toString()
         val result =
-            EvaluateElement
-                .instance<_, Throwable>(elementToEvaluate)
+            EvaluateElements
+                .One
+                .element<_, Throwable>(elementToEvaluate)
                 .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
                 .evaluate()
                 .toMaybeSuccess()
@@ -54,8 +29,9 @@ class EvaluateElementTest {
     fun `evaluate must return success success or multiple errors if multiple valid evaluations was provided`() {
         val elementToEvaluate = Uuid.random().toString()
         val result =
-            EvaluateElement
-                .instance<_, Throwable>(elementToEvaluate)
+            EvaluateElements
+                .One
+                .element<_, Throwable>(elementToEvaluate)
                 .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
                 .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
                 .evaluate()
@@ -70,8 +46,9 @@ class EvaluateElementTest {
         val elementToEvaluate = Uuid.random().toString()
         val error = Exception(Uuid.random().toString())
         val result =
-            EvaluateElement
-                .instance<_, Throwable>(elementToEvaluate)
+            EvaluateElements
+                .One
+                .element<_, Throwable>(elementToEvaluate)
                 .addEvaluation({ error }) { false }
                 .evaluate()
                 .toErrors()
@@ -88,8 +65,9 @@ class EvaluateElementTest {
         val error1 = Exception(Uuid.random().toString())
         val error2 = Exception(Uuid.random().toString())
         val result =
-            EvaluateElement
-                .instance<_, Throwable>(elementToEvaluate)
+            EvaluateElements
+                .One
+                .element<_, Throwable>(elementToEvaluate)
                 .addEvaluation({ error1 }) { false }
                 .addEvaluation({ error2 }) { false }
                 .evaluate()
@@ -107,8 +85,9 @@ class EvaluateElementTest {
         val elementToEvaluate = Uuid.random().toString()
         val error = Exception(Uuid.random().toString())
         val result =
-            EvaluateElement
-                .instance<_, Throwable>(elementToEvaluate)
+            EvaluateElements
+                .One
+                .element<_, Throwable>(elementToEvaluate)
                 .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
                 .addEvaluation({ error }) { false }
                 .evaluate()
