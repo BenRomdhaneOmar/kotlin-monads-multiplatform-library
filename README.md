@@ -57,6 +57,10 @@
 
 [Evaluate one element test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/evaluation/EvaluateOneElementTest.kt)
 
+### Evaluate two elements:
+
+[Evaluate two elements test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/evaluation/EvaluateTwoElementsTest.kt)
+
 ## Tuples:
 
 ### Pair:

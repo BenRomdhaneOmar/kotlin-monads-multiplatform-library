@@ -2,6 +2,7 @@ package com.benromdhane.omar.offroadsoft.monad.evaluation
 
 import com.benromdhane.omar.offroadsoft.monad.error.PossibleError
 import com.benromdhane.omar.offroadsoft.monad.error.SuccessOrMultipleErrors
+import com.benromdhane.omar.offroadsoft.monad.tuple.Pair
 
 sealed interface EvaluateElements {
 
@@ -16,8 +17,11 @@ sealed interface EvaluateElements {
             PreparedEvaluation
                 .of(
                     this.element,
-                    error,
-                    check
+                    Evaluation
+                        .of(
+                            error,
+                            check
+                        )
                 )
 
         companion object {
@@ -52,24 +56,92 @@ sealed interface EvaluateElements {
                 )
 
             fun evaluate() =
-                this.evaluations
-                    .map { it.evaluate(this.element) }
-                    .filter { it.error() }
-                    .map { it.toMaybeError() }
-                    .filter { it.present() }
-                    .map { it.orNull() }
-                    .map { it!! }
-                    .toSuccessOrMultipleErrors(this.element)
+                evaluate(
+                    this.evaluations,
+                    this.element
+                )
 
             internal companion object Builder {
 
                 internal fun <ELEMENT : Any, ERROR : Any> of(
                     element: ELEMENT,
-                    error: () -> ERROR,
-                    check: (ELEMENT) -> Boolean
+                    evaluation: Evaluation<ELEMENT, ERROR>
                 ) =
                     PreparedEvaluation(
                         element,
+                        setOf(
+                            evaluation
+                        )
+                    )
+            }
+        }
+    }
+
+    class Two<FIRST_ELEMENT : Any, ERROR : Any> private constructor(
+        private val firstElement: FIRST_ELEMENT
+    ) {
+
+        fun addEvaluation(
+            error: () -> ERROR,
+            check: (FIRST_ELEMENT) -> Boolean
+        ) =
+            FirstLevelPreparedEvaluation
+                .of(
+                    this.firstElement,
+                    error,
+                    check
+                )
+
+        companion object {
+
+            fun <FIRST_ELEMENT : Any, ERROR : Any> first(
+                firstElement: FIRST_ELEMENT
+            ) =
+                Two<_, ERROR>(
+                    firstElement
+                )
+        }
+
+        class FirstLevelPreparedEvaluation<FIRST_ELEMENT : Any, ERROR : Any> private constructor(
+            private val firstElement: FIRST_ELEMENT,
+            private val firstElementEvaluations: Set<Evaluation<FIRST_ELEMENT, ERROR>>
+        ) {
+
+            fun addEvaluation(
+                error: () -> ERROR,
+                check: (FIRST_ELEMENT) -> Boolean
+            ) =
+                FirstLevelPreparedEvaluation(
+                    firstElement,
+                    this.firstElementEvaluations
+                        .plus(
+                            Evaluation
+                                .of(
+                                    error,
+                                    check
+                                )
+                        )
+                )
+
+            fun <SECOND_ELEMENT : Any> second(
+                secondElement: SECOND_ELEMENT
+            ) =
+                SecondLevelNonPreparedEvaluation
+                    .of(
+                        this.firstElement,
+                        this.firstElementEvaluations,
+                        secondElement
+                    )
+
+            internal companion object Builder {
+
+                fun <FIRST_ELEMENT : Any, ERROR : Any> of(
+                    firstElement: FIRST_ELEMENT,
+                    error: () -> ERROR,
+                    check: (FIRST_ELEMENT) -> Boolean
+                ) =
+                    FirstLevelPreparedEvaluation(
+                        firstElement,
                         setOf(
                             Evaluation
                                 .of(
@@ -79,16 +151,123 @@ sealed interface EvaluateElements {
                         )
                     )
             }
+
+            class SecondLevelNonPreparedEvaluation<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, ERROR : Any> private constructor(
+                private val firstElement: FIRST_ELEMENT,
+                private val firstElementEvaluations: Set<Evaluation<FIRST_ELEMENT, ERROR>>,
+                private val secondElement: SECOND_ELEMENT
+            ) {
+
+                fun addEvaluation(
+                    error: () -> ERROR,
+                    check: (SECOND_ELEMENT) -> Boolean
+                ) =
+                    SecondLevelPreparedEvaluation
+                        .of(
+                            this.firstElement,
+                            this.firstElementEvaluations,
+                            this.secondElement,
+                            Evaluation
+                                .of(
+                                    error,
+                                    check
+                                )
+                        )
+
+                internal companion object Builder {
+
+                    internal fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, ERROR : Any> of(
+                        firstElement: FIRST_ELEMENT,
+                        firstElementEvaluations: Set<Evaluation<FIRST_ELEMENT, ERROR>>,
+                        secondElement: SECOND_ELEMENT
+                    ) =
+                        SecondLevelNonPreparedEvaluation(
+                            firstElement,
+                            firstElementEvaluations,
+                            secondElement
+                        )
+                }
+
+                class SecondLevelPreparedEvaluation<FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, ERROR : Any> private constructor(
+                    private val firstElement: FIRST_ELEMENT,
+                    private val firstElementEvaluations: Set<Evaluation<FIRST_ELEMENT, ERROR>>,
+                    private val secondElement: SECOND_ELEMENT,
+                    private val secondElementEvaluations: Set<Evaluation<SECOND_ELEMENT, ERROR>>
+                ) {
+
+                    fun addEvaluation(
+                        error: () -> ERROR,
+                        check: (SECOND_ELEMENT) -> Boolean
+                    ) =
+                        SecondLevelPreparedEvaluation(
+                            this.firstElement,
+                            this.firstElementEvaluations,
+                            this.secondElement,
+                            this.secondElementEvaluations
+                                .plus(
+                                    Evaluation
+                                        .of(
+                                            error,
+                                            check
+                                        )
+                                )
+                        )
+
+                    fun evaluate() =
+                        evaluateFirst()
+                            .toErrors()
+                            .plus(
+                                evaluateSecond().toErrors()
+                            )
+                            .toSet()
+                            .toSuccessOrMultipleErrors(
+                                Pair.of(
+                                    this.firstElement,
+                                    this.secondElement
+                                )
+                            )
+
+                    private fun evaluateFirst() =
+                        evaluate(
+                            this.firstElementEvaluations,
+                            this.firstElement
+                        )
+
+                    private fun evaluateSecond() =
+                        evaluate(
+                            this.secondElementEvaluations,
+                            this.secondElement
+                        )
+
+                    internal companion object Builder {
+
+                        internal fun <FIRST_ELEMENT : Any, SECOND_ELEMENT : Any, ERROR : Any> of(
+                            firstElement: FIRST_ELEMENT,
+                            firstElementEvaluations: Set<Evaluation<FIRST_ELEMENT, ERROR>>,
+                            secondElement: SECOND_ELEMENT,
+                            secondElementEvaluation: Evaluation<SECOND_ELEMENT, ERROR>
+                        ) =
+                            SecondLevelPreparedEvaluation(
+                                firstElement,
+                                firstElementEvaluations,
+                                secondElement,
+                                setOf(
+                                    secondElementEvaluation
+                                )
+                            )
+                    }
+                }
+            }
         }
     }
 }
 
 @ConsistentCopyVisibility
-private data class Evaluation<ELEMENT : Any, ERROR : Any> private constructor(
+internal data class Evaluation<ELEMENT : Any, ERROR : Any> private constructor(
     val error: () -> ERROR,
     val check: (ELEMENT) -> Boolean
 ) {
-    fun evaluate(
+    internal fun evaluate(
         element: ELEMENT
     ) =
         if (this.check(element))
@@ -96,9 +275,9 @@ private data class Evaluation<ELEMENT : Any, ERROR : Any> private constructor(
         else
             PossibleError.Error.of(this.error())
 
-    companion object Builder {
+    internal companion object Builder {
 
-        fun <ELEMENT : Any, ERROR : Any> of(
+        internal fun <ELEMENT : Any, ERROR : Any> of(
             error: () -> ERROR,
             check: (ELEMENT) -> Boolean
         ) =
@@ -108,6 +287,19 @@ private data class Evaluation<ELEMENT : Any, ERROR : Any> private constructor(
             )
     }
 }
+
+private fun <ELEMENT : Any, ERROR : Any> evaluate(
+    evaluations: Set<Evaluation<ELEMENT, ERROR>>,
+    element: ELEMENT
+) =
+    evaluations
+        .map { it.evaluate(element) }
+        .filter { it.error() }
+        .map { it.toMaybeError() }
+        .filter { it.present() }
+        .map { it.orNull() }
+        .map { it!! }
+        .toSuccessOrMultipleErrors(element)
 
 private fun <ELEMENT : Any, ERROR : Any> Collection<ERROR>.toSuccessOrMultipleErrors(element: ELEMENT) =
     if (this.isEmpty())
