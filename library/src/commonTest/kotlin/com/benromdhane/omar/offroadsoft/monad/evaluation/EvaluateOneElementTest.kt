@@ -14,8 +14,7 @@ class EvaluateOneElementTest {
     fun `evaluate must return success success or multiple errors if one valid evaluation was provided`() {
         val elementToEvaluate = Uuid.random().toString()
         val result =
-            EvaluateElements
-                .One
+            EvaluateOneElement
                 .element<_, Throwable>(elementToEvaluate)
                 .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
                 .evaluate()
@@ -29,8 +28,7 @@ class EvaluateOneElementTest {
     fun `evaluate must return success success or multiple errors if multiple valid evaluations was provided`() {
         val elementToEvaluate = Uuid.random().toString()
         val result =
-            EvaluateElements
-                .One
+            EvaluateOneElement
                 .element<_, Throwable>(elementToEvaluate)
                 .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
                 .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
@@ -46,8 +44,7 @@ class EvaluateOneElementTest {
         val elementToEvaluate = Uuid.random().toString()
         val error = Exception(Uuid.random().toString())
         val result =
-            EvaluateElements
-                .One
+            EvaluateOneElement
                 .element<_, Throwable>(elementToEvaluate)
                 .addEvaluation({ error }) { false }
                 .evaluate()
@@ -65,8 +62,7 @@ class EvaluateOneElementTest {
         val error1 = Exception(Uuid.random().toString())
         val error2 = Exception(Uuid.random().toString())
         val result =
-            EvaluateElements
-                .One
+            EvaluateOneElement
                 .element<_, Throwable>(elementToEvaluate)
                 .addEvaluation({ error1 }) { false }
                 .addEvaluation({ error2 }) { false }
@@ -85,8 +81,7 @@ class EvaluateOneElementTest {
         val elementToEvaluate = Uuid.random().toString()
         val error = Exception(Uuid.random().toString())
         val result =
-            EvaluateElements
-                .One
+            EvaluateOneElement
                 .element<_, Throwable>(elementToEvaluate)
                 .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
                 .addEvaluation({ error }) { false }

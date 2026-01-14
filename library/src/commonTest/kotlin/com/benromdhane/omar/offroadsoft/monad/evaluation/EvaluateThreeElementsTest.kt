@@ -16,17 +16,17 @@ class EvaluateThreeElementsTest {
         val firstElementToEvaluate = Uuid.random().toString()
         val secondElementToEvaluate = Random.nextInt()
         val thirdElementToEvaluate = Random.nextLong()
-        val result = EvaluateElements
-            .Three
-            .first<_, Throwable>(firstElementToEvaluate)
-            .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
-            .second(secondElementToEvaluate)
-            .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
-            .third(thirdElementToEvaluate)
-            .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
-            .evaluate()
-            .toMaybeSuccess()
-            .orNull()!!
+        val result =
+            EvaluateThreeElements
+                .first<_, Throwable>(firstElementToEvaluate)
+                .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
+                .second(secondElementToEvaluate)
+                .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
+                .third(thirdElementToEvaluate)
+                .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
+                .evaluate()
+                .toMaybeSuccess()
+                .orNull()!!
 
         assertSoftly {
             assertEquals(firstElementToEvaluate, result.firstElement)
@@ -40,20 +40,20 @@ class EvaluateThreeElementsTest {
         val firstElementToEvaluate = Uuid.random().toString()
         val secondElementToEvaluate = Random.nextInt()
         val thirdElementToEvaluate = Random.nextLong()
-        val result = EvaluateElements
-            .Three
-            .first<_, Throwable>(firstElementToEvaluate)
-            .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
-            .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
-            .second(secondElementToEvaluate)
-            .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
-            .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
-            .third(thirdElementToEvaluate)
-            .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
-            .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
-            .evaluate()
-            .toMaybeSuccess()
-            .orNull()!!
+        val result =
+            EvaluateThreeElements
+                .first<_, Throwable>(firstElementToEvaluate)
+                .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
+                .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
+                .second(secondElementToEvaluate)
+                .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
+                .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
+                .third(thirdElementToEvaluate)
+                .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
+                .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
+                .evaluate()
+                .toMaybeSuccess()
+                .orNull()!!
 
         assertSoftly {
             assertEquals(firstElementToEvaluate, result.firstElement)
@@ -70,19 +70,19 @@ class EvaluateThreeElementsTest {
         val secondElementError2 = Exception(Uuid.random().toString())
         val thirdElementError1 = Exception(Uuid.random().toString())
         val thirdElementError2 = Exception(Uuid.random().toString())
-        val result = EvaluateElements
-            .Three
-            .first<_, Throwable>(Uuid.random().toString())
-            .addEvaluation({ firstElementError1 }) { true }
-            .addEvaluation({ firstElementError2 }) { false }
-            .second(Random.nextInt())
-            .addEvaluation({ secondElementError1 }) { false }
-            .addEvaluation({ secondElementError2 }) { true }
-            .third(Random.nextLong())
-            .addEvaluation({ thirdElementError1 }) { true }
-            .addEvaluation({ thirdElementError2 }) { false }
-            .evaluate()
-            .toErrors()
+        val result =
+            EvaluateThreeElements
+                .first<_, Throwable>(Uuid.random().toString())
+                .addEvaluation({ firstElementError1 }) { true }
+                .addEvaluation({ firstElementError2 }) { false }
+                .second(Random.nextInt())
+                .addEvaluation({ secondElementError1 }) { false }
+                .addEvaluation({ secondElementError2 }) { true }
+                .third(Random.nextLong())
+                .addEvaluation({ thirdElementError1 }) { true }
+                .addEvaluation({ thirdElementError2 }) { false }
+                .evaluate()
+                .toErrors()
 
         assertSoftly {
             assertEquals(3, result.size)
