@@ -16,8 +16,7 @@ class EvaluateTwoElementsTest {
         val firstElementToEvaluate = Uuid.random().toString()
         val secondElementToEvaluate = Random.nextInt()
         val result =
-            EvaluateElements
-                .Two
+            EvaluateTwoElements
                 .first<_, Throwable>(firstElementToEvaluate)
                 .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
                 .second(secondElementToEvaluate)
@@ -37,8 +36,7 @@ class EvaluateTwoElementsTest {
         val firstElementToEvaluate = Uuid.random().toString()
         val secondElementToEvaluate = Random.nextInt()
         val result =
-            EvaluateElements
-                .Two
+            EvaluateTwoElements
                 .first<_, Throwable>(firstElementToEvaluate)
                 .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
                 .addEvaluation({ Exception(Uuid.random().toString()) }) { true }
@@ -60,8 +58,7 @@ class EvaluateTwoElementsTest {
         val firstElementEvaluateError = Exception(Uuid.random().toString())
         val secondElementEvaluateError = Exception(Uuid.random().toString())
         val result =
-            EvaluateElements
-                .Two
+            EvaluateTwoElements
                 .first<_, Throwable>(Uuid.random().toString())
                 .addEvaluation({ firstElementEvaluateError }) { false }
                 .second(Random.nextInt())
@@ -83,8 +80,7 @@ class EvaluateTwoElementsTest {
         val secondElementEvaluateError1 = Exception(Uuid.random().toString())
         val secondElementEvaluateError2 = Exception(Uuid.random().toString())
         val result =
-            EvaluateElements
-                .Two
+            EvaluateTwoElements
                 .first<_, Throwable>(Uuid.random().toString())
                 .addEvaluation({ firstElementEvaluateError1 }) { false }
                 .addEvaluation({ firstElementEvaluateError2 }) { false }
@@ -110,8 +106,7 @@ class EvaluateTwoElementsTest {
         val secondElementEvaluateError1 = Exception(Uuid.random().toString())
         val secondElementEvaluateError2 = Exception(Uuid.random().toString())
         val result =
-            EvaluateElements
-                .Two
+            EvaluateTwoElements
                 .first<_, Throwable>(Uuid.random().toString())
                 .addEvaluation({ firstElementEvaluateError1 }) { true }
                 .addEvaluation({ firstElementEvaluateError2 }) { true }
@@ -135,8 +130,7 @@ class EvaluateTwoElementsTest {
         val secondElementEvaluateError1 = Exception(Uuid.random().toString())
         val secondElementEvaluateError2 = Exception(Uuid.random().toString())
         val result =
-            EvaluateElements
-                .Two
+            EvaluateTwoElements
                 .first<_, Throwable>(Uuid.random().toString())
                 .addEvaluation({ firstElementEvaluateError1 }) { false }
                 .addEvaluation({ firstElementEvaluateError2 }) { false }
@@ -160,8 +154,7 @@ class EvaluateTwoElementsTest {
         val secondElementEvaluateError1 = Exception(Uuid.random().toString())
         val secondElementEvaluateError2 = Exception(Uuid.random().toString())
         val result =
-            EvaluateElements
-                .Two
+            EvaluateTwoElements
                 .first<_, Throwable>(Uuid.random().toString())
                 .addEvaluation({ firstElementEvaluateError1 }) { false }
                 .addEvaluation({ firstElementEvaluateError2 }) { true }
