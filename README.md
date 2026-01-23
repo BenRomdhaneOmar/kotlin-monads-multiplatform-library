@@ -61,6 +61,18 @@
 
 [Evaluate two elements test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/evaluation/EvaluateTwoElementsTest.kt)
 
+### Evaluate three elements:
+
+[Evaluate three elements test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/evaluation/EvaluateThreeElementsTest.kt)
+
+### Evaluate four elements:
+
+[Evaluate four elements test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/evaluation/EvaluateFourElementsTest.kt)
+
+### Evaluate five elements:
+
+[Evaluate five elements test class](./library/src/commonTest/kotlin/com/benromdhane/omar/offroadsoft/monad/evaluation/EvaluateFiveElementsTest.kt)
+
 ## Tuples:
 
 ### Pair:
